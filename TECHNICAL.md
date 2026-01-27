@@ -1,6 +1,6 @@
 # OnSpect AI - Technische Documentatie
 
-Dit document beschrijft de technische architectuur en implementatie van OnSpect AI voor presentatie aan stakeholders.
+Dit document beschrijft de technische architectuur en implementatie van OnSpect AI.
 
 ---
 
@@ -26,19 +26,6 @@ OnSpect AI is een AI-gestuurde assistent die scholen helpt bij het werken met he
 ### Wat is Ollama?
 
 Ollama is een open-source platform waarmee je Large Language Models (LLMs) lokaal kunt draaien op je eigen hardware. In plaats van dat je verzoeken naar een externe dienst stuurt zoals ChatGPT of Claude, draait het AI-model volledig op je eigen computer of server. Dit heeft belangrijke voordelen voor privacy en kosten.
-
-Ollama fungeert als een "runtime" voor AI-modellen. Het beheert het laden van modellen in het geheugen, optimaliseert de inferentie voor je specifieke hardware (CPU, GPU, of Apple Silicon), en biedt een eenvoudige API waarmee applicaties kunnen communiceren met het model.
-
-### Hoe werkt een lokaal AI-model?
-
-Een Large Language Model is in essentie een zeer groot neuraal netwerk dat getraind is op miljarden teksten. Het model heeft geleerd patronen in taal te herkennen en kan op basis daarvan coherente, contextbewuste antwoorden genereren. Bij elke vraag die je stelt:
-
-1. **Tokenisatie**: Je tekst wordt opgesplitst in "tokens" (woorden of woorddelen)
-2. **Context verwerking**: Het model verwerkt alle tokens samen met de systeeminstructies
-3. **Generatie**: Token voor token wordt het antwoord gegenereerd, waarbij elk volgend token wordt voorspeld op basis van alle voorgaande tokens
-4. **Streaming**: De tokens worden direct teruggestuurd zodat je het antwoord ziet verschijnen
-
-Het model zelf is een bestand van enkele tot tientallen gigabytes dat volledig in het werkgeheugen (RAM) of videogeheugen (VRAM) moet worden geladen.
 
 ### Het Qwen3 model
 
