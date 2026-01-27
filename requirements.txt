@@ -1,0 +1,10 @@
+# OnSpect AI Dependencies
+
+# Core
+ollama>=0.3.0
+
+# Web Interface
+streamlit>=1.30.0
+
+# Development (optional)
+pytest>=8.0.0
