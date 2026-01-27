@@ -1,10 +1,10 @@
-# OnSpect AI
+# Kwaliteitszorg AI
 
 Een AI-assistent die scholen helpt met het waarderingskader van de Inspectie van het Onderwijs.
 
-## Wat is OnSpect AI?
+## Wat is Kwaliteitszorg AI?
 
-OnSpect AI is een lokaal draaiende AI-assistent die scholen ondersteunt bij het werken met deugdelijkheidseisen uit het waarderingskader van de Inspectie van het Onderwijs. De assistent kan:
+Kwaliteitszorg AI is een lokaal draaiende AI-assistent die scholen ondersteunt bij het werken met deugdelijkheidseisen uit het waarderingskader van de Inspectie van het Onderwijs. De assistent kan:
 
 - **Uitleg geven** over wat een deugdelijkheidseis inhoudt
 - **Feedback geven** op de invulling van een school
@@ -32,7 +32,7 @@ OnSpect AI is een lokaal draaiende AI-assistent die scholen ondersteunt bij het 
 1. **Clone de repository**
    ```bash
    git clone <repository-url>
-   cd OnSpectAIv2
+   cd KwaliteitszorgAIv2
    ```
 
 2. **Installeer dependencies**
@@ -82,10 +82,10 @@ Open vervolgens http://localhost:8501 in je browser.
 ## Projectstructuur
 
 ```
-OnSpectAIv2/
+KwaliteitszorgAIv2/
 ├── config/
 │   └── settings.py          # Centrale configuratie
-├── src/onspect/
+├── src/Kwaliteitszorg/
 │   ├── models/              # Dataclasses
 │   ├── core/                # Context en conversatie management
 │   ├── assistant/           # AI assistent en prompts
@@ -106,8 +106,8 @@ Pas de instellingen aan via environment variables of `.env`:
 
 | Variable | Default | Beschrijving |
 |----------|---------|--------------|
-| `ONSPECT_MODEL` | `gemma3:27b` | Het Ollama model |
-| `ONSPECT_MAX_TOKENS` | `12000` | Maximum context tokens |
+| `Kwaliteitszorg_MODEL` | `gemma3:27b` | Het Ollama model |
+| `Kwaliteitszorg_MAX_TOKENS` | `12000` | Maximum context tokens |
 
 ## Tests uitvoeren
 
