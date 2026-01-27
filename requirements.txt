@@ -1,4 +1,4 @@
-# OnSpect AI Dependencies
+# Kwaliteitszorg AI Dependencies
 
 # Core
 ollama>=0.3.0

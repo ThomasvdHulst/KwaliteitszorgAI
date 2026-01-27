@@ -1,4 +1,4 @@
-"""Utility functies voor OnSpect AI."""
+"""Utility functies voor Kwaliteitszorg AI."""
 
 from .database import load_database, load_deugdelijkheidseis
 

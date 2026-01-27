@@ -1,5 +1,5 @@
 #!/bin/bash
-# OnSpect AI Demo Launcher
+# Kwaliteitszorg AI Demo Launcher
 # Start de Streamlit web interface
 
 set -e
@@ -10,7 +10,7 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 cd "$PROJECT_ROOT"
 
 echo "=================================="
-echo "OnSpect AI - Demo Launcher"
+echo "Kwaliteitszorg AI - Demo Launcher"
 echo "=================================="
 
 # Check of Ollama draait
@@ -21,7 +21,7 @@ if ! pgrep -x "ollama" > /dev/null; then
 fi
 
 # Check of het model beschikbaar is
-MODEL=${ONSPECT_MODEL:-"gemma3:27b"}
+MODEL=${KWALITEITSZORG_MODEL:-"gemma3:27b"}
 echo "Gebruikt model: $MODEL"
 
 # Start Streamlit

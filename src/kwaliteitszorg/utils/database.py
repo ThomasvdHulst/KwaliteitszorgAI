@@ -1,4 +1,4 @@
-"""Database loading utilities voor OnSpect AI."""
+"""Database loading utilities voor Kwaliteitszorg AI."""
 
 import json
 from typing import Dict

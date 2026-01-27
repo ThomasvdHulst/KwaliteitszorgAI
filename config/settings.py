@@ -1,5 +1,5 @@
 """
-Centrale configuratie voor OnSpect AI.
+Centrale configuratie voor Kwaliteitszorg AI.
 
 Instellingen kunnen worden overschreven via environment variables.
 """
@@ -12,10 +12,10 @@ DATA_DIR = BASE_DIR / "data"
 DATABASE_PATH = DATA_DIR / "deugdelijkheidseisen_db.json"
 
 # Model
-MODEL_NAME = os.getenv("ONSPECT_MODEL", "gemma3:27b")
+MODEL_NAME = os.getenv("KWALITEITSZORG_MODEL", "gemma3:27b")
 
 # Context - verhoogd voor chat-continuatie
-MAX_CONTEXT_TOKENS = int(os.getenv("ONSPECT_MAX_TOKENS", "16000"))
+MAX_CONTEXT_TOKENS = int(os.getenv("KWALITEITSZORG_MAX_TOKENS", "16000"))
 NUM_CTX = 32768  # Context window van het model
 
 # Generatie

@@ -1,13 +1,13 @@
-# OnSpect AI - Technische Documentatie
+# Kwaliteitszorg AI - Technische Documentatie
 
-Dit document beschrijft de technische architectuur en implementatie van OnSpect AI.
+Dit document beschrijft de technische architectuur en implementatie van Kwaliteitszorg AI.
 
 ---
 
 ## 1. Systeemoverzicht
 
 ### Doel
-OnSpect AI is een AI-gestuurde assistent die scholen helpt bij het werken met het waarderingskader van de Inspectie van het Onderwijs. Het systeem geeft feedback op de invulling van deugdelijkheidseisen binnen de PDCA-cyclus (Plan-Do-Check-Act).
+Kwaliteitszorg AI is een AI-gestuurde assistent die scholen helpt bij het werken met het waarderingskader van de Inspectie van het Onderwijs. Het systeem geeft feedback op de invulling van deugdelijkheidseisen binnen de PDCA-cyclus (Plan-Do-Check-Act).
 
 ### Doelgroep
 - Schoolleiders en kwaliteitscoordinatoren in het voortgezet onderwijs
@@ -29,7 +29,7 @@ Ollama is een open-source platform waarmee je Large Language Models (LLMs) lokaa
 
 ### Het Gemma3 model
 
-OnSpect AI gebruikt standaard het **Gemma3:27b** model van Google. Dit is een open-source model met 27 miljard parameters. De "27b" staat voor 27 billion (miljard) parameters - dit zijn de geleerde gewichten in het neurale netwerk.
+Kwaliteitszorg AI gebruikt standaard het **Gemma3:27b** model van Google. Dit is een open-source model met 27 miljard parameters. De "27b" staat voor 27 billion (miljard) parameters - dit zijn de geleerde gewichten in het neurale netwerk.
 
 Kenmerken van Gemma3:27b:
 - **Taalondersteuning**: Uitstekende prestaties in Nederlands en Engels
@@ -44,7 +44,7 @@ Er zijn ook kleinere varianten beschikbaar (4b, 12b) die minder geheugen nodig h
 
 ## 3. Integratie met PHP-applicaties
 
-De OnSpect AI assistent is geschreven in Python, maar kan eenvoudig communiceren met de bestaande PHP-applicatie. Er zijn verschillende integratiemethoden mogelijk, afhankelijk van de gewenste architectuur.
+De Kwaliteitszorg AI assistent is geschreven in Python, maar kan eenvoudig communiceren met de bestaande PHP-applicatie. Er zijn verschillende integratiemethoden mogelijk, afhankelijk van de gewenste architectuur.
 
 ### Optie 1: REST API (Aanbevolen)
 
@@ -62,7 +62,7 @@ De meest robuuste oplossing is om de Python-applicatie als een microservice te d
 # api_server.py
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from src.onspect import DeugdelijkheidseisAssistent, SchoolInvulling
+from src.kwaliteitszorg import DeugdelijkheidseisAssistent, SchoolInvulling
 
 app = FastAPI()
 assistent = DeugdelijkheidseisAssistent()
@@ -102,7 +102,7 @@ def chat(request: ChatRequest):
 
 ```php
 <?php
-class OnSpectAIClient {
+class KwaliteitszorgAIClient {
     private string $baseUrl;
 
     public function __construct(string $baseUrl = 'http://localhost:8000') {
@@ -137,7 +137,7 @@ class OnSpectAIClient {
         curl_close($ch);
 
         if ($httpCode !== 200) {
-            throw new Exception("OnSpect AI error: HTTP $httpCode");
+            throw new Exception("Kwaliteitszorg AI error: HTTP $httpCode");
         }
 
         return json_decode($response, true);
@@ -145,7 +145,7 @@ class OnSpectAIClient {
 }
 
 // Gebruik in je PHP-applicatie:
-$ai = new OnSpectAIClient('http://ai-server:8000');
+$ai = new KwaliteitszorgAIClient('http://ai-server:8000');
 
 $result = $ai->chat(
     eisId: 'VS1.5',
@@ -172,7 +172,7 @@ Als je de Python-laag wilt overslaan, kun je Ollama ook rechtstreeks vanuit PHP 
 
 **Nadelen:**
 - Je moet de prompt-logica dupliceren in PHP
-- Geen gebruik van de OnSpect-specifieke context en instructies
+- Geen gebruik van de Kwaliteitszorg-specifieke context en instructies
 - Meer onderhoud bij wijzigingen
 
 ```php
@@ -229,7 +229,7 @@ Dit vereist meer infrastructuur maar schaalt beter en voorkomt timeouts bij piek
 
 ### Aanbevolen architectuur voor productie
 
-Voor de OnSpect-applicatie adviseren we **Optie 1 (REST API)** met de volgende setup:
+Voor de Kwaliteitszorg-applicatie adviseren we **Optie 1 (REST API)** met de volgende setup:
 
 ```
 ┌─────────────────┐      HTTP/JSON       ┌─────────────────┐
@@ -273,7 +273,7 @@ Voor de OnSpect-applicatie adviseren we **Optie 1 (REST API)** met de volgende s
                                 ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                  DeugdelijkheidseisAssistent                    │
-│              (src/onspect/assistant/assistent.py)               │
+│              (src/kwaliteitszorg/assistant/assistent.py)               │
 │                                                                 │
 │  - Bouwt system prompt met context                              │
 │  - Beheert chatgeschiedenis                                     │
@@ -308,10 +308,10 @@ Voor de OnSpect-applicatie adviseren we **Optie 1 (REST API)** met de volgende s
 | Module | Verantwoordelijkheid |
 |--------|---------------------|
 | `config/settings.py` | Centrale configuratie (model, tokens, parameters) |
-| `src/onspect/models/school_invulling.py` | Dataclass voor schoolinvulling |
-| `src/onspect/assistant/prompts.py` | System prompt en taak-instructies |
-| `src/onspect/assistant/assistent.py` | Hoofdklasse met chat-logica |
-| `src/onspect/utils/database.py` | Laden van deugdelijkheidseisen |
+| `src/kwaliteitszorg/models/school_invulling.py` | Dataclass voor schoolinvulling |
+| `src/kwaliteitszorg/assistant/prompts.py` | System prompt en taak-instructies |
+| `src/kwaliteitszorg/assistant/assistent.py` | Hoofdklasse met chat-logica |
+| `src/kwaliteitszorg/utils/database.py` | Laden van deugdelijkheidseisen |
 
 ---
 
@@ -385,8 +385,8 @@ streamlit run app/streamlit_app.py
 
 | Variable | Default | Beschrijving |
 |----------|---------|--------------|
-| `ONSPECT_MODEL` | `gemma3:27b` | Ollama model naam |
-| `ONSPECT_MAX_TOKENS` | `16000` | Maximum context tokens |
+| `KWALITEITSZORG_MODEL` | `gemma3:27b` | Ollama model naam |
+| `KWALITEITSZORG_MAX_TOKENS` | `16000` | Maximum context tokens |
 
 ### Parameters (config/settings.py)
 

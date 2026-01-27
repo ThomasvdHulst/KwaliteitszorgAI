@@ -1,7 +1,7 @@
 """
-OnSpect AI - Streamlit Web Interface
+Kwaliteitszorg AI - Streamlit Web Interface
 
-Chat-interface met OnSpect huisstijl.
+Chat-interface voor kwaliteitszorg onderwijs.
 """
 
 import sys
@@ -13,8 +13,8 @@ sys.path.insert(0, str(PROJECT_ROOT))
 import streamlit as st
 
 from config import settings
-from src.onspect import DeugdelijkheidseisAssistent, SchoolInvulling
-from src.onspect.utils.database import load_database
+from src.kwaliteitszorg import DeugdelijkheidseisAssistent, SchoolInvulling
+from src.kwaliteitszorg.utils.database import load_database
 
 # ============================================================================
 # EXPERIMENTEEL: Suggestie feature import
@@ -27,7 +27,7 @@ except ImportError:
     SUGGESTIES_ENABLED = False
 # ============================================================================
 
-# OnSpect kleuren
+# Thema kleuren
 COLORS = {
     "primary": "#4599D5",
     "primary_dark": "#2C81C0",
@@ -253,7 +253,7 @@ def reset_chat():
 
 def render_chat_message(role: str, content: str):
     """Render een chat bericht."""
-    role_label = "Jij" if role == "user" else "OnSpect AI"
+    role_label = "Jij" if role == "user" else "Kwaliteitszorg AI"
     css_class = "user" if role == "user" else "assistant"
 
     st.markdown(f"""
@@ -266,7 +266,7 @@ def render_chat_message(role: str, content: str):
 
 def render_chat_tab(selected_id: str, school_invulling: SchoolInvulling):
     """Render de chat tab."""
-    st.markdown("### Chat met OnSpect AI")
+    st.markdown("### Chat met Kwaliteitszorg AI")
 
     # Toon bestaande berichten
     for msg in st.session_state.messages:
@@ -324,7 +324,7 @@ def render_chat_tab(selected_id: str, school_invulling: SchoolInvulling):
                     response_buffer += chunk
                     response_placeholder.markdown(f"""
                     <div class="chat-message assistant">
-                        <div class="role">OnSpect AI</div>
+                        <div class="role">Kwaliteitszorg AI</div>
                         <div class="content">{response_buffer}</div>
                     </div>
                     """, unsafe_allow_html=True)
@@ -348,8 +348,8 @@ def render_chat_tab(selected_id: str, school_invulling: SchoolInvulling):
 
 def main():
     st.set_page_config(
-        page_title="OnSpect AI",
-        page_icon="https://www.onspect.nl/favicon.ico",
+        page_title="Kwaliteitszorg AI",
+        page_icon="🎓",
         layout="wide",
         initial_sidebar_state="collapsed",
     )

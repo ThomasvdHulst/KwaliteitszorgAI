@@ -1,5 +1,5 @@
 """
-Suggestie-module voor OnSpect AI.
+Suggestie-module voor Kwaliteitszorg AI.
 
 Deze module is experimenteel en kan worden verwijderd zonder impact op de rest.
 Biedt functionaliteit voor het genereren van concrete tekstsuggesties per veld.
@@ -36,7 +36,7 @@ class SuggestieResultaat:
     raw_response: Optional[str] = None
 
 
-SUGGESTIE_PROMPT = """Je bent OnSpect AI. Je taak is om concrete tekstsuggesties te geven voor de schoolinvulling.
+SUGGESTIE_PROMPT = """Je bent Kwaliteitszorg AI. Je taak is om concrete tekstsuggesties te geven voor de schoolinvulling.
 
 Analyseer de huidige invulling en geef voor elk veld dat verbeterd kan worden een concrete nieuwe tekst.
 

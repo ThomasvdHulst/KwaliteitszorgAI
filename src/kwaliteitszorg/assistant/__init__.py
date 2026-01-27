@@ -1,4 +1,4 @@
-"""Assistant module voor OnSpect AI."""
+"""Assistant module voor Kwaliteitszorg AI."""
 
 from .assistent import DeugdelijkheidseisAssistent
 from .prompts import SYSTEM_PROMPT, get_task_instruction

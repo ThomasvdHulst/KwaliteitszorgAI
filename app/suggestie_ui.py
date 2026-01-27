@@ -1,7 +1,7 @@
 """
 UI componenten voor de suggestie-feature.
 
-Dit bestand kan worden verwijderd samen met src/onspect/assistant/suggesties.py
+Dit bestand kan worden verwijderd samen met src/kwaliteitszorg/assistant/suggesties.py
 om de feature volledig te verwijderen.
 """
 
@@ -9,8 +9,8 @@ import streamlit as st
 from typing import Dict
 
 # Importeer alleen wat nodig is
-from src.onspect.assistant.suggesties import SuggestieGenerator, VeldSuggestie, SuggestieResultaat
-from src.onspect import SchoolInvulling
+from src.kwaliteitszorg.assistant.suggesties import SuggestieGenerator, VeldSuggestie, SuggestieResultaat
+from src.kwaliteitszorg import SchoolInvulling
 
 
 # Kleuren voor diff weergave

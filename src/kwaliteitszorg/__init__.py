@@ -1,5 +1,5 @@
 """
-OnSpect AI - Deugdelijkheidseisen Assistent
+Kwaliteitszorg AI - Deugdelijkheidseisen Assistent
 
 Een AI-assistent die scholen helpt met het waarderingskader
 van de Inspectie van het Onderwijs.

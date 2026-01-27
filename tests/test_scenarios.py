@@ -1,5 +1,5 @@
 """
-Test scenarios voor OnSpect AI.
+Test scenarios voor Kwaliteitszorg AI.
 
 Test de chat-functionaliteit met verschillende invullingen.
 """
@@ -10,7 +10,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.onspect import DeugdelijkheidseisAssistent, SchoolInvulling
+from src.kwaliteitszorg import DeugdelijkheidseisAssistent, SchoolInvulling
 
 
 def print_stream(chunk: str) -> None:
