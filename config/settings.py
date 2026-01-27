@@ -12,7 +12,7 @@ DATA_DIR = BASE_DIR / "data"
 DATABASE_PATH = DATA_DIR / "deugdelijkheidseisen_db.json"
 
 # Model
-MODEL_NAME = os.getenv("ONSPECT_MODEL", "qwen3:30b")
+MODEL_NAME = os.getenv("ONSPECT_MODEL", "gemma3:27b")
 
 # Context - verhoogd voor chat-continuatie
 MAX_CONTEXT_TOKENS = int(os.getenv("ONSPECT_MAX_TOKENS", "16000"))

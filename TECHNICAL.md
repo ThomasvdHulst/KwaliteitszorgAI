@@ -27,65 +27,31 @@ OnSpect AI is een AI-gestuurde assistent die scholen helpt bij het werken met he
 
 Ollama is een open-source platform waarmee je Large Language Models (LLMs) lokaal kunt draaien op je eigen hardware. In plaats van dat je verzoeken naar een externe dienst stuurt zoals ChatGPT of Claude, draait het AI-model volledig op je eigen computer of server. Dit heeft belangrijke voordelen voor privacy en kosten.
 
+Ollama fungeert als een "runtime" voor AI-modellen. Het beheert het laden van modellen in het geheugen, optimaliseert de inferentie voor je specifieke hardware (CPU, GPU, of Apple Silicon), en biedt een eenvoudige API waarmee applicaties kunnen communiceren met het model.
+
+### Hoe werkt een lokaal AI-model?
+
+Een Large Language Model is in essentie een zeer groot neuraal netwerk dat getraind is op miljarden teksten. Het model heeft geleerd patronen in taal te herkennen en kan op basis daarvan coherente, contextbewuste antwoorden genereren. Bij elke vraag die je stelt:
+
+1. **Tokenisatie**: Je tekst wordt opgesplitst in "tokens" (woorden of woorddelen)
+2. **Context verwerking**: Het model verwerkt alle tokens samen met de systeeminstructies
+3. **Generatie**: Token voor token wordt het antwoord gegenereerd, waarbij elk volgend token wordt voorspeld op basis van alle voorgaande tokens
+4. **Streaming**: De tokens worden direct teruggestuurd zodat je het antwoord ziet verschijnen
+
+Het model zelf is een bestand van enkele tot tientallen gigabytes dat volledig in het werkgeheugen (RAM) of videogeheugen (VRAM) moet worden geladen.
+
 ### Het Qwen3 model
 
-OnSpect AI gebruikt standaard het **Qwen3:30b** model van Alibaba. Dit is een open-source model met 30 miljard parameters. De "30b" staat voor 30 billion (miljard) parameters - dit zijn de geleerde gewichten in het neurale netwerk.
+OnSpect AI gebruikt standaard het **Gemma3:27b** model van Google. Dit is een open-source model met 27 miljard parameters. De "27b" staat voor 27 billion (miljard) parameters - dit zijn de geleerde gewichten in het neurale netwerk.
 
-Kenmerken van Qwen3:30b:
+Kenmerken van Gemma3:27b:
 - **Taalondersteuning**: Uitstekende prestaties in Nederlands en Engels
-- **Context window**: Kan tot 32.000 tokens (ongeveer 24.000 woorden) tegelijk verwerken
-- **Reasoning**: Goede capaciteiten voor redeneren en gestructureerde feedback
-- **Licentie**: Open-source, vrij te gebruiken voor commerciele toepassingen
+- **Context window**: Kan tot 128.000 tokens tegelijk verwerken
+- **Reasoning**: Sterke capaciteiten voor redeneren en gestructureerde feedback
+- **Multimodaal**: Ondersteunt ook afbeeldingen als input (niet gebruikt in deze applicatie)
+- **Licentie**: Open-source, vrij te gebruiken
 
-Er zijn ook kleinere varianten beschikbaar (8b, 14b) die minder geheugen nodig hebben maar ook minder capabel zijn, en grotere varianten die beter presteren maar meer resources vereisen.
-
-### Hardware vereisten
-
-De hardware-eisen hangen af van het gekozen model. Het model moet volledig in het geheugen passen voor optimale prestaties.
-
-**Voor Qwen3:30b (aanbevolen):**
-- **RAM**: Minimaal 24GB, aanbevolen 32GB
-- **Opslag**: 20GB voor het modelbestand
-- **Processor**: Apple Silicon (M1/M2/M3) of moderne x86 CPU met AVX2 ondersteuning
-- **GPU** (optioneel): NVIDIA GPU met minimaal 24GB VRAM voor snellere inferentie
-
-**Voor Qwen3:8b (lichtgewicht alternatief):**
-- **RAM**: Minimaal 8GB, aanbevolen 16GB
-- **Opslag**: 5GB voor het modelbestand
-- **Processor**: Elke moderne multi-core CPU
-
-Apple Silicon Macs zijn bijzonder geschikt omdat ze unified memory gebruiken, waardoor het volledige systeemgeheugen beschikbaar is voor het model. Een M2 MacBook Pro met 32GB RAM kan het 30b model comfortabel draaien.
-
-### Server deployment
-
-Voor productie-gebruik op een server zijn dit de aanbevelingen:
-
-**Minimale serverspecificaties:**
-- **CPU**: 8+ cores (AMD EPYC of Intel Xeon aanbevolen)
-- **RAM**: 64GB voor comfortabele werking met 30b model
-- **Opslag**: SSD met minimaal 50GB vrij
-- **OS**: Ubuntu 22.04 LTS of vergelijkbaar
-
-**Met GPU-acceleratie (aanbevolen voor meerdere gebruikers):**
-- **GPU**: NVIDIA A10 (24GB), A100 (40GB/80GB), of RTX 4090 (24GB)
-- **CUDA**: Versie 11.8 of hoger
-- Verwachte responsetijd: 20-50 tokens per seconde
-
-**Zonder GPU:**
-- Verwachte responsetijd: 5-15 tokens per seconde (afhankelijk van CPU)
-- Geschikt voor laag volume gebruik (enkele gebruikers tegelijk)
-
-### Kosten vergelijking
-
-Een belangrijk voordeel van lokale AI is de kostenstructuur. Bij cloud-diensten betaal je per token (invoer en uitvoer), wat bij intensief gebruik snel oploopt.
-
-| Oplossing | Kosten | Opmerkingen |
-|-----------|--------|-------------|
-| OpenAI GPT-4 | ~€0.03-0.06 per 1K tokens | Variabele kosten, afhankelijk van gebruik |
-| Claude API | ~€0.015-0.075 per 1K tokens | Variabele kosten |
-| Lokaal (Ollama) | Eenmalige hardware investering | Geen doorlopende API-kosten |
-
-Voor OnSpect AI, waar elke vraag ongeveer 2.000-4.000 tokens verbruikt, zou cloudgebruik bij 1.000 vragen per maand neerkomen op €60-240 per maand. Met een lokale oplossing zijn er na de initiele hardware-investering geen doorlopende kosten.
+Er zijn ook kleinere varianten beschikbaar (4b, 12b) die minder geheugen nodig hebben maar ook minder capabel zijn.
 
 ---
 
@@ -230,7 +196,7 @@ class OllamaClient {
 
     public function __construct(
         string $baseUrl = 'http://localhost:11434',
-        string $model = 'qwen3:30b'
+        string $model = 'gemma3:27b'
     ) {
         $this->baseUrl = $baseUrl;
         $this->model = $model;
@@ -374,16 +340,15 @@ Voor de OnSpect-applicatie adviseren we **Optie 1 (REST API)** met de volgende s
 ### Aanbevolen configuratie (productie)
 - **Hardware**: Apple Silicon Mac of Linux server met GPU
 - **RAM**: 32GB of meer
-- **Model**: qwen3:30b
+- **Model**: gemma3:27b
 
 ### Modelalternatieven
 
 | Model | RAM nodig | Kwaliteit | Snelheid | Aanbevolen voor |
 |-------|-----------|-----------|----------|-----------------|
-| qwen3:8b | 8GB | Basis | Snel | Demo, testing |
-| qwen3:14b | 12GB | Goed | Gemiddeld | Licht productiegebruik |
-| qwen3:30b | 24GB | Zeer goed | Gemiddeld | Productie (aanbevolen) |
-| qwen3:32b | 26GB | Uitstekend | Langzaam | Maximale kwaliteit |
+| gemma3:4b | 4GB | Basis | Zeer snel | Demo, testing |
+| gemma3:12b | 12GB | Goed | Snel | Licht productiegebruik |
+| gemma3:27b | 24GB | Zeer goed | Gemiddeld | Productie (aanbevolen) |
 
 ---
 
@@ -404,10 +369,10 @@ curl -fsSL https://ollama.ai/install.sh | sh
 ### Stap 2: Model downloaden
 
 ```bash
-ollama pull qwen3:30b
+ollama pull gemma3:27b
 ```
 
-Dit downloadt ongeveer 18GB aan modeldata.
+Dit downloadt ongeveer 17GB aan modeldata.
 
 ### Stap 3: Python dependencies
 
@@ -433,7 +398,7 @@ streamlit run app/streamlit_app.py
 
 | Variable | Default | Beschrijving |
 |----------|---------|--------------|
-| `ONSPECT_MODEL` | `qwen3:30b` | Ollama model naam |
+| `ONSPECT_MODEL` | `gemma3:27b` | Ollama model naam |
 | `ONSPECT_MAX_TOKENS` | `16000` | Maximum context tokens |
 
 ### Parameters (config/settings.py)
@@ -447,65 +412,4 @@ streamlit run app/streamlit_app.py
 
 ---
 
-## 8. Beveiliging
 
-### Privacy voordelen van lokale AI
-- **Geen externe API's**: Alle verwerking gebeurt lokaal
-- **Geen data transmissie**: Schoolgegevens verlaten nooit je netwerk
-- **Geen cloud dependency**: Werkt volledig offline na installatie
-- **Geen logging door derden**: Je hebt volledige controle over logs
-
-### Aanbevelingen voor productie
-
-1. **Netwerk isolatie**: Draai Ollama alleen op localhost of binnen een beveiligd netwerk
-2. **Toegangsbeheer**: Implementeer authenticatie op de API-laag
-3. **Rate limiting**: Beperk het aantal verzoeken per gebruiker
-4. **Logging**: Log queries voor debugging, maar vermijd het loggen van gevoelige schooldata
-5. **Updates**: Houd Ollama en Python packages up-to-date
-
-### Data classificatie
-
-| Data | Classificatie | Opslag |
-|------|---------------|--------|
-| Deugdelijkheidseisen | Openbaar | Database bestand |
-| Schoolinvullingen | Vertrouwelijk | Alleen in sessie-geheugen |
-| Chatgeschiedenis | Vertrouwelijk | Alleen in sessie-geheugen |
-
----
-
-## 9. Toekomstige Ontwikkeling
-
-### Mogelijke uitbreidingen
-1. **Persistente chats**: Opslaan van conversaties in database
-2. **Multi-school support**: Meerdere scholen met eigen profielen en geschiedenis
-3. **RAG-integratie**: Automatisch ophalen van relevante voorbeelden uit een documentdatabase
-4. **Rapportgeneratie**: Export van feedback naar Word/PDF
-5. **Fine-tuning**: Trainen van een gespecialiseerd model op onderwijsdata
-
-### PHP-integratie roadmap
-1. **Fase 1**: REST API implementeren (beschreven in sectie 3)
-2. **Fase 2**: Sessie-management voor chat-continuiteit
-3. **Fase 3**: Webhook-integratie voor real-time updates
-4. **Fase 4**: Volledige embedding in bestaande PHP-interface
-
----
-
-## 10. Veelgestelde vragen
-
-**Hoe snel zijn de responses?**
-Met een 30b model op Apple Silicon M2/M3 met 32GB RAM kun je 15-25 tokens per seconde verwachten. Een typisch antwoord van 500 woorden duurt dan 30-60 seconden.
-
-**Kan dit op een gedeelde webserver draaien?**
-Nee, vanwege de hoge geheugenvereisten is een dedicated server of krachtige lokale machine nodig.
-
-**Wat als het model een fout antwoord geeft?**
-Het model is getraind op algemene data en kan fouten maken. De kwaliteit van de feedback hangt af van de kwaliteit van de deugdelijkheidseisen-database en de instructies. Controleer altijd kritisch.
-
-**Kunnen meerdere gebruikers tegelijk de applicatie gebruiken?**
-Ja, maar responses worden sequentieel verwerkt. Bij veel gelijktijdige gebruikers ontstaat een wachtrij. Voor hoog volume is GPU-acceleratie of meerdere Ollama-instances nodig.
-
----
-
-## 11. Contact
-
-Voor technische vragen of ondersteuning, neem contact op met de ontwikkelaar.

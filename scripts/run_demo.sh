@@ -21,7 +21,7 @@ if ! pgrep -x "ollama" > /dev/null; then
 fi
 
 # Check of het model beschikbaar is
-MODEL=${ONSPECT_MODEL:-"qwen3:30b"}
+MODEL=${ONSPECT_MODEL:-"gemma3:27b"}
 echo "Gebruikt model: $MODEL"
 
 # Start Streamlit

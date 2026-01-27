@@ -182,7 +182,7 @@ def render_suggesties_tab(
 
     st.markdown("### Suggesties voor verbetering")
     st.markdown(
-        "Laat de AI concrete tekstsuggesties genereren voor je invulling. "
+        "Laat de AI concrete suggesties genereren voor je invulling. "
         "Je kunt elke suggestie accepteren of weigeren."
     )
 

@@ -42,7 +42,7 @@ OnSpect AI is een lokaal draaiende AI-assistent die scholen ondersteunt bij het 
 
 3. **Download het AI model via Ollama**
    ```bash
-   ollama pull qwen3:30b
+   ollama pull gemma3:27b
    ```
 
 4. **Kopieer de voorbeeldconfiguratie**
@@ -106,7 +106,7 @@ Pas de instellingen aan via environment variables of `.env`:
 
 | Variable | Default | Beschrijving |
 |----------|---------|--------------|
-| `ONSPECT_MODEL` | `qwen3:30b` | Het Ollama model |
+| `ONSPECT_MODEL` | `gemma3:27b` | Het Ollama model |
 | `ONSPECT_MAX_TOKENS` | `12000` | Maximum context tokens |
 
 ## Tests uitvoeren
