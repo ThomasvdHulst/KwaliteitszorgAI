@@ -3,6 +3,8 @@
 import json
 from typing import Dict
 
+from config.settings import logger
+
 
 def load_database(database_path: str) -> Dict:
     """Laadt de deugdelijkheidseisen database uit JSON bestand."""
@@ -10,11 +12,14 @@ def load_database(database_path: str) -> Dict:
         with open(database_path, "r", encoding="utf-8") as f:
             return json.load(f)
     except FileNotFoundError:
-        print(f"WAARSCHUWING: Database bestand '{database_path}' niet gevonden.")
-        print("Maak een bestand 'deugdelijkheidseisen_db.json' aan met de deugdelijkheidseisen.")
+        logger.warning(
+            "Database bestand '%s' niet gevonden. "
+            "Maak een bestand 'deugdelijkheidseisen_db.json' aan.",
+            database_path
+        )
         return {"deugdelijkheidseisen": {}}
     except json.JSONDecodeError as e:
-        print(f"FOUT: Kan database bestand niet laden: {e}")
+        logger.error("Kan database bestand niet laden: %s", e)
         return {"deugdelijkheidseisen": {}}
 
 
@@ -25,9 +30,9 @@ def load_deugdelijkheidseis(database: Dict, deugdelijkheidseis_id: str) -> Dict:
     if deugdelijkheidseis_id in eisen:
         return eisen[deugdelijkheidseis_id]
     else:
-        print(
-            f"WAARSCHUWING: Deugdelijkheidseis '{deugdelijkheidseis_id}' "
-            "niet gevonden in database."
+        logger.warning(
+            "Deugdelijkheidseis '%s' niet gevonden in database.",
+            deugdelijkheidseis_id
         )
         return {
             "id": deugdelijkheidseis_id,

@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - ONSPECTAI_API_KEY=${ONSPECTAI_API_KEY:-development-key}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000}
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - KWALITEITSZORG_MODEL=${KWALITEITSZORG_MODEL:-gemma3:27b}
+      - REQUEST_TIMEOUT=${REQUEST_TIMEOUT:-120}
+      - KWALITEITSZORG_LOG_LEVEL=${KWALITEITSZORG_LOG_LEVEL:-INFO}
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - onspectai
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - onspectai
+    # Uncomment for GPU support (NVIDIA)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+volumes:
+  ollama_data:
+
+networks:
+  onspectai:
+    driver: bridge

@@ -1,0 +1,140 @@
+{
+  "beschrijving": "Voorbeeldinvullingen voor het testen van de OnSpectAI API. Per eis zijn er 3 voorbeelden: goed, gemiddeld (op weg maar mist nog wat), en zwak (zeer ondermaat).",
+  "invullingen": {
+    "VS 1.1": {
+      "titel": "Algemene Veiligheid",
+      "goed": {
+        "niveau": "goed",
+        "omschrijving": "Volledige, concrete invulling met alle veiligheidsdimensies, meetbare doelen en PDCA-cyclus",
+        "ambitie": "Onze school streeft naar een veilige, inclusieve omgeving waar elke leerling zich sociaal, fysiek en psychisch veilig voelt. We creëren een cultuur waarin respect, openheid en zorgzaamheid centraal staan. Veiligheid is een gedeelde verantwoordelijkheid van het hele team.",
+        "beoogd_resultaat": "Minimaal 92% van de leerlingen geeft in de jaarlijkse veiligheidsmonitor aan zich veilig te voelen op school. Het aantal geregistreerde pestincidenten is maximaal 8 per jaar. Alle gemelde incidenten worden binnen 48 uur opgepakt door de betrokken medewerker.",
+        "concrete_acties": "We voeren wekelijks mentorlessen uit met structurele aandacht voor sociale veiligheid, pesten en mentale gezondheid. Ons anti-pestprotocol wordt actief gecommuniceerd via de leerlingenraad, ouderavonden en de nieuwsbrief. Er is een vertrouwenspersoon aangesteld en leerlingen kunnen anoniem melden via ons digitale meldpunt. Twee keer per jaar volgt het personeel een training over signalering en gespreksvoering. We organiseren jaarlijks themadagen over diversiteit, respect en mentale gezondheid. Elke brugklasser krijgt een buddy uit een hogere klas. Het facilitair team voert maandelijks veiligheidsrondes uit door gebouw en terrein. Twee keer per jaar oefenen we ontruiming met alle leerlingen en personeel. We werken nauw samen met de wijkagent, jeugdzorg en GGZ.",
+        "wijze_van_meten": "We voeren jaarlijks een veiligheidsmonitor uit met Vensters VO bij alle leerlingen, met een minimale respons van 80%. Halfjaarlijks peilen we onder ouders de veiligheidsbeleving. Alle incidenten worden digitaal geregistreerd in ons leerlingvolgsysteem. Maandelijks bespreekt het zorgteam de incidenten en analyseert patronen. Elk kwartaal is er overleg met de leerlingenraad specifiek over veiligheid. Jaarlijks evalueren we het beleid schoolbreed met leerlingenraad, ouderraad, personeel en externe partners."
+      },
+      "gemiddeld": {
+        "niveau": "gemiddeld",
+        "omschrijving": "Redelijke basis maar mist concreetheid, meetbare doelen en volledige PDCA-cyclus",
+        "ambitie": "Wij willen dat alle leerlingen zich veilig voelen op school. Veiligheid vinden wij belangrijk en daar besteden we aandacht aan.",
+        "beoogd_resultaat": "Leerlingen voelen zich veilig op school. We willen dat er weinig pestincidenten zijn en dat leerlingen weten waar ze terecht kunnen bij problemen.",
+        "concrete_acties": "We hebben een veiligheidsprotocol dat beschikbaar is op school. Docenten houden toezicht tijdens de pauzes. De mentoren bespreken regelmatig het welbevinden met leerlingen. We hebben een vertrouwenspersoon waar leerlingen naartoe kunnen. Bij incidenten wordt actie ondernomen door de betrokken docent of mentor.",
+        "wijze_van_meten": "We doen jaarlijks een enquête onder leerlingen over veiligheid. De resultaten worden besproken in het team."
+      },
+      "zwak": {
+        "niveau": "zwak",
+        "omschrijving": "Zeer ondermaat: vaag, geen concrete acties, geen meetbare doelen, geen systematiek",
+        "ambitie": "Veiligheid is belangrijk.",
+        "beoogd_resultaat": "Leerlingen zijn veilig.",
+        "concrete_acties": "We letten op veiligheid. Als er iets gebeurt pakken we dat aan.",
+        "wijze_van_meten": "We kijken of het goed gaat."
+      }
+    },
+    "VS 1.5": {
+      "titel": "Anti-pestcoördinator",
+      "goed": {
+        "niveau": "goed",
+        "omschrijving": "Concrete persoon benoemd met beide taken, goede zichtbaarheid, scholing en evaluatie",
+        "ambitie": "Onze school heeft een duidelijk en toegankelijk aanspreekpunt voor pesten. Leerlingen en ouders weten precies bij wie ze terecht kunnen. De anti-pestcoördinator is het gezicht van onze pestpreventie en heeft de regie over ons anti-pestbeleid.",
+        "beoogd_resultaat": "We hebben een goed geschoolde, zichtbare en toegankelijke anti-pestcoördinator die voor minimaal 90% van de leerlingen en ouders bekend is. De coördinator ontvangt alle pestmeldingen, coördineert de afhandeling, en houdt het anti-pestbeleid actueel. Meldingen worden binnen 24 uur opgepakt.",
+        "concrete_acties": "Mevrouw Bakker is aangesteld als onze anti-pestcoördinator en combineert beide rollen: aanspreekpunt voor leerlingen en ouders én beleidscoördinatie. Bij aanstelling heeft zij een driedaagse training gevolgd over pestherkenning en gesprekstechnieken. Jaarlijks krijgt zij tijd voor een professionaliseringscursus. Elk schooljaar stelt mevrouw Bakker zich voor aan alle brugklassen. Er hangen posters in de school met haar foto, naam en contactgegevens. Zij heeft twee vaste inloopmomenten per week. In haar taakbeleid is 0,2 fte toegewezen voor de anti-pestcoördinatie. Ze staat vermeld in de schoolgids met foto en uitleg over haar rol. Op de website is een pagina over pesten met haar als aanspreekpunt. Bij ouderavonden voor brugklasouders wordt ze voorgesteld.",
+        "wijze_van_meten": "In de jaarlijkse veiligheidsenquête vragen we leerlingen en ouders of ze weten wie de anti-pestcoördinator is en hoe ze haar kunnen bereiken (streef: >90% bekendheid). De schoolleiding voert halfjaarlijks een evaluatiegesprek met mevrouw Bakker over het aantal meldingen, het functioneren en scholingswensen. Alle meldingen worden geregistreerd inclusief responstijd. Jaarlijks evalueert mevrouw Bakker het anti-pestbeleid in het team."
+      },
+      "gemiddeld": {
+        "niveau": "gemiddeld",
+        "omschrijving": "Er is iemand aangewezen maar taken zijn verdeeld of zichtbaarheid is onvoldoende",
+        "ambitie": "We willen dat leerlingen en ouders weten waar ze terecht kunnen bij pesten. Het pestbeleid moet goed gecoördineerd worden.",
+        "beoogd_resultaat": "Leerlingen kunnen terecht bij iemand als er gepest wordt. Het anti-pestbeleid is actueel.",
+        "concrete_acties": "De mentoren zijn het eerste aanspreekpunt voor leerlingen bij pestproblemen. Mevrouw Jansen van het zorgteam coördineert het anti-pestbeleid en zorgt dat het protocol actueel is. Complexe gevallen worden doorverwezen naar het zorgteam. In de schoolgids staat informatie over ons pestbeleid.",
+        "wijze_van_meten": "We evalueren jaarlijks met mentoren hoe de aanpak van pestgevallen verloopt. Mevrouw Jansen rapporteert aan de directie over het anti-pestbeleid."
+      },
+      "zwak": {
+        "niveau": "zwak",
+        "omschrijving": "Geen concrete persoon, gaat over pestbeleid in het algemeen, niet over de coördinator",
+        "ambitie": "Onze school wil pesten voorkomen en aanpakken.",
+        "beoogd_resultaat": "Er wordt niet gepest op school.",
+        "concrete_acties": "We hebben een anti-pestprotocol. Docenten letten op pestgedrag. Als er gepest wordt, grijpen we in. We doen mee aan de Week tegen Pesten.",
+        "wijze_van_meten": "We houden bij hoeveel pestincidenten er zijn."
+      }
+    },
+    "OP 0.1": {
+      "titel": "Doelgericht en samenhangend curriculum voor Nederlandse taal",
+      "goed": {
+        "niveau": "goed",
+        "omschrijving": "Doelgericht en samenhangend curriculum met doorlopende leerlijn, alle vijf onderdelen, en referentieniveaus",
+        "ambitie": "We bieden een doelgericht en samenhangend taalcurriculum dat aansluit bij onze diverse leerlingpopulatie. Alle leerlingen ontwikkelen de taalvaardigheden die zij nodig hebben voor hun vervolgonderwijs en om volwaardig te kunnen functioneren in de maatschappij. Taalonderwijs vormt de basis voor al het leren op onze school.",
+        "beoogd_resultaat": "Minimaal 85% van onze leerlingen behaalt het vereiste referentieniveau voor taal (2F voor vmbo, 3F voor havo, 4F voor vwo). Het curriculum dekt alle vijf onderdelen van taalvaardigheid via een doorlopende leerlijn van leerjaar 1 tot en met het examenjaar.",
+        "concrete_acties": "We werken met een doorlopende leerlijn Nederlands van leerjaar 1 t/m 6, vastgelegd in ons vakwerkplan. Per leerjaar zijn concrete leerdoelen geformuleerd die toewerken naar de referentieniveaus. Er is verticale samenhang: elk leerjaar bouwt voort op het vorige, afgestemd tussen onderbouw en bovenbouw. Taalvaardigheden worden ook in andere vakken geoefend: bij geschiedenis werken leerlingen aan begrijpend lezen, bij biologie aan vaktaal, bij CKV aan presenteren. Alle vijf onderdelen komen aan bod: mondelinge taalvaardigheid via presentaties en discussies, lezen via literatuur en zakelijke teksten, schrijven via betogen en verslagen, woordenschat via begrippenlijsten per vak, en taalverzorging via spelling en grammatica. We gebruiken de methode Nieuw Nederlands die de kerndoelen dekt. Leerlingen met een taalachterstand krijgen extra ondersteuning via onze taalcoach.",
+        "wijze_van_meten": "We meten het taalniveau via Cito VAS-toetsen in leerjaar 1 en 3 om de voortgang richting het referentieniveau te monitoren. In het examenjaar wordt het referentieniveau getoetst via het centraal examen Nederlands. Tussentijds volgen we leerlingen via formatieve toetsen. De resultaten worden driemaal per jaar besproken in de taalwerkgroep. Bij achterblijvende resultaten stellen we interventies in. We analyseren jaarlijks de examenresultaten en vergelijken met voorgaande jaren."
+      },
+      "gemiddeld": {
+        "niveau": "gemiddeld",
+        "omschrijving": "Redelijke basis maar mist explicite doorlopende leerlijn, samenhang of concrete doelen",
+        "ambitie": "We willen goed taalonderwijs bieden zodat leerlingen voldoende taalvaardig worden voor hun vervolgopleiding.",
+        "beoogd_resultaat": "Leerlingen halen voldoende resultaten voor Nederlands en zijn voorbereid op het vervolgonderwijs.",
+        "concrete_acties": "We gebruiken de methode Nieuw Nederlands in alle leerjaren. Leerlingen krijgen 4 uur Nederlands per week. Er zijn toetsen aan het einde van elk hoofdstuk. We besteden aandacht aan lezen, schrijven en grammatica. Leerlingen met achterstanden kunnen extra begeleiding krijgen.",
+        "wijze_van_meten": "We kijken naar de cijfers voor Nederlands en de resultaten op het eindexamen. Als leerlingen achterblijven bespreken we dat in de rapportvergadering."
+      },
+      "zwak": {
+        "niveau": "zwak",
+        "omschrijving": "Geen curriculum beschreven, alleen methode genoemd, geen doelen of samenhang",
+        "ambitie": "Leerlingen moeten goed Nederlands leren.",
+        "beoogd_resultaat": "Leerlingen halen goede cijfers voor Nederlands.",
+        "concrete_acties": "We hebben de methode Nieuw Nederlands. Leerlingen maken de opdrachten en toetsen.",
+        "wijze_van_meten": "We kijken naar de cijfers."
+      }
+    },
+    "OP 2.1": {
+      "titel": "Verzamelen van (toets)informatie",
+      "goed": {
+        "niveau": "goed",
+        "omschrijving": "Systematische aanpak vanaf binnenkomst, beide domeinen, concreet LVS en evaluatie",
+        "ambitie": "We willen alle leerlingen goed in beeld hebben door systematisch informatie te verzamelen over hun cognitieve en sociaal-emotionele ontwikkeling, vanaf het moment dat ze bij ons op school komen. Zo kunnen we tijdig signaleren als een leerling extra ondersteuning nodig heeft.",
+        "beoogd_resultaat": "Voor elke leerling is actuele, volledige informatie beschikbaar in Magister over hun vorderingen en ontwikkeling. Bij binnenkomst in leerjaar 1 hebben we een compleet beeld van elke leerling op basis van de overdracht vanuit het primair onderwijs.",
+        "concrete_acties": "Bij aanmelding ontvangen we het onderwijskundig rapport van de basisschool en voeren we een intakegesprek met ouders en leerling. In mei/juni hebben we warme overdracht met alle toeleverende basisscholen waarbij we elk kind individueel bespreken. In de eerste weken van leerjaar 1 doen we een nulmeting op Nederlands en rekenen via DIA-toetsen. Alle toetsresultaten worden binnen één week door docenten ingevoerd in Magister. De mentor voert minimaal drie keer per jaar een individueel gesprek met elke leerling en legt dit vast. In leerjaar 1, 2 en 3 nemen we jaarlijks DIA-toetsen af. Vakdocenten kunnen notities over leerlingen plaatsen in Magister. We gebruiken SAQI om sociaal-emotionele ontwikkeling te monitoren.",
+        "wijze_van_meten": "De zorgcoördinator controleert tweemaal per jaar steekproefsgewijs of leerlingdossiers compleet zijn. We evalueren jaarlijks of de warme overdracht vanuit PO voldoende informatie oplevert. In teamvergaderingen bespreken we of Magister consequent wordt gebruikt. We analyseren de respons op de SAQI-vragenlijst."
+      },
+      "gemiddeld": {
+        "niveau": "gemiddeld",
+        "omschrijving": "Redelijke basis maar mist systematiek of dekt niet beide domeinen volledig",
+        "ambitie": "We willen leerlingen goed volgen zodat we weten hoe het met ze gaat.",
+        "beoogd_resultaat": "Docenten en mentoren hebben een goed beeld van hoe leerlingen presteren en hoe het met ze gaat.",
+        "concrete_acties": "We gebruiken Magister als leerlingvolgsysteem. Docenten voeren cijfers in na elke toets. We ontvangen het onderwijskundig rapport van de basisschool. De mentor heeft regelmatig contact met leerlingen. Bij zorgsignalen wordt dit besproken in het team.",
+        "wijze_van_meten": "We kijken of de cijfers zijn ingevoerd in Magister. Als er problemen zijn met een leerling bespreken we dat in de zorgvergadering."
+      },
+      "zwak": {
+        "niveau": "zwak",
+        "omschrijving": "Geen systematiek, reactief in plaats van proactief, onduidelijk proces",
+        "ambitie": "We houden leerlingen in de gaten.",
+        "beoogd_resultaat": "We weten hoe het gaat met leerlingen.",
+        "concrete_acties": "Docenten voeren cijfers in. Als er problemen zijn horen we dat wel.",
+        "wijze_van_meten": "We merken het als er iets aan de hand is."
+      }
+    },
+    "OP 4.5": {
+      "titel": "Maatwerk in onderwijstijd",
+      "goed": {
+        "niveau": "goed",
+        "omschrijving": "Duidelijk proces, alle 8 OPP-onderdelen, samenwerking externen, terugkeerplan",
+        "ambitie": "Wanneer de reguliere onderwijstijd niet haalbaar of niet in het belang is van een leerling door ziekte, beperking of andere bijzondere omstandigheden, bieden we passend maatwerk. Ons doel is dat de leerling optimaal onderwijs blijft volgen en zo snel als verantwoord is terugkeert naar het volledige programma op school.",
+        "beoogd_resultaat": "Bij leerlingen voor wie de reguliere onderwijstijd niet passend is, wordt tijdig maatwerk geboden volgens een duidelijk, wettelijk conform proces. Het maatwerk wordt volledig vastgelegd in het OPP met alle verplichte onderdelen, afgestemd met ouders en waar nodig goedgekeurd door de inspectie. Elk traject is gericht op terugkeer naar volledig onderwijs.",
+        "concrete_acties": "We hebben het proces voor maatwerk in onderwijstijd beschreven in ons zorgplan. Bij signalering volgen we deze stappen: bespreking in het zorgteam met mentor en ouders, opstellen of aanpassen van het OPP met alle 8 verplichte onderdelen, instemming vragen aan ouders, indien nodig aanvraag indienen bij inspectie via Internet Schooldossier, uitvoering met regelmatige evaluatie, en actief werken aan terugkeer. In het OPP leggen we vast: de onderbouwing, concrete uren, periode, wat de leerling wél doet, begeleiding, en het terugkeerplan. We werken samen met het OPDC en de ziekenhuisschool. De zorgcoördinator houdt een overzicht bij van alle lopende maatwerktrajecten. Minimaal elk kwartaal evalueren we met ouders en leerling.",
+        "wijze_van_meten": "Per leerling evalueren we minimaal jaarlijks het OPP en het effect van het maatwerk. We registreren het aantal leerlingen met maatwerk en analyseren jaarlijks of het proces goed verloopt. Bij elk traject evalueren we of de terugkeer naar volledig onderwijs verloopt zoals gepland. We vragen feedback aan ouders over hun ervaring met het proces."
+      },
+      "gemiddeld": {
+        "niveau": "gemiddeld",
+        "omschrijving": "Er is aandacht voor maatwerk maar proces is niet volledig of OPP-eisen missen",
+        "ambitie": "Als leerlingen niet volledig naar school kunnen, zoeken we naar passende oplossingen.",
+        "beoogd_resultaat": "Leerlingen die niet volledig naar school kunnen krijgen een aangepast programma.",
+        "concrete_acties": "Als een leerling vanwege ziekte of andere redenen niet volledig kan deelnemen, bespreken we dit in het zorgteam. We maken afspraken over wat de leerling wel kan doen. We werken samen met externe partijen als dat nodig is. We leggen de afspraken vast.",
+        "wijze_van_meten": "We evalueren regelmatig met de leerling en ouders of de afspraken werken."
+      },
+      "zwak": {
+        "niveau": "zwak",
+        "omschrijving": "Geen proces, verwarring met andere vormen van maatwerk, geen OPP of wettelijke vereisten",
+        "ambitie": "We bieden maatwerk aan leerlingen.",
+        "beoogd_resultaat": "Leerlingen krijgen onderwijs dat bij hen past.",
+        "concrete_acties": "We hebben talentklassen en leerlingen kunnen extra vakken volgen. Sporters krijgen een aangepast rooster.",
+        "wijze_van_meten": "We kijken of leerlingen tevreden zijn."
+      }
+    }
+  }
+}

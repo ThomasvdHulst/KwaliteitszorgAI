@@ -15,16 +15,45 @@ import streamlit as st
 from config import settings
 from src.kwaliteitszorg import DeugdelijkheidseisAssistent, SchoolInvulling
 from src.kwaliteitszorg.utils.database import load_database
+from src.kwaliteitszorg.utils.pdf_processor import extract_text_from_pdf
 
 # ============================================================================
 # EXPERIMENTEEL: Suggestie feature import
 # Verwijder dit blok + de aanroep in main() om de feature uit te schakelen
 # ============================================================================
 try:
-    from suggestie_ui import render_suggesties_tab
+    # Absolute import path voor robuustheid
+    from app.suggestie_ui import render_suggesties_tab
     SUGGESTIES_ENABLED = True
 except ImportError:
-    SUGGESTIES_ENABLED = False
+    try:
+        # Fallback voor directe uitvoering vanuit app/ directory
+        from suggestie_ui import render_suggesties_tab
+        SUGGESTIES_ENABLED = True
+    except ImportError:
+        SUGGESTIES_ENABLED = False
+# ============================================================================
+
+# ============================================================================
+# RAG (Document Databank) feature import
+# ============================================================================
+try:
+    from app.rag_ui import (
+        init_rag_state,
+        render_rag_toggle,
+        render_document_databank,
+    )
+    RAG_ENABLED = True
+except ImportError:
+    try:
+        from rag_ui import (
+            init_rag_state,
+            render_rag_toggle,
+            render_document_databank,
+        )
+        RAG_ENABLED = True
+    except ImportError:
+        RAG_ENABLED = False
 # ============================================================================
 
 # Thema kleuren
@@ -232,6 +261,14 @@ def init_session_state():
         st.session_state.messages = []
     if "current_eis" not in st.session_state:
         st.session_state.current_eis = None
+    # Document upload state
+    if "document_text" not in st.session_state:
+        st.session_state.document_text = None
+    if "document_filename" not in st.session_state:
+        st.session_state.document_filename = None
+    # RAG state
+    if RAG_ENABLED:
+        init_rag_state()
 
 
 def reset_chat():
@@ -249,28 +286,183 @@ def reset_chat():
     # Reset input velden
     for key in ["input_ambitie", "input_resultaat", "input_acties", "input_meten"]:
         st.session_state[key] = ""
+    # Reset document (niet automatisch - gebruiker moet expliciet verwijderen)
+    # st.session_state.document_text = None
+    # st.session_state.document_filename = None
 
 
-def render_chat_message(role: str, content: str):
-    """Render een chat bericht."""
-    role_label = "Jij" if role == "user" else "Kwaliteitszorg AI"
-    css_class = "user" if role == "user" else "assistant"
+def render_chat_message(role: str, content: str, sources: list = None):
+    """Render een chat bericht met optionele bronvermelding."""
+    # Gebruik Streamlit's native chat_message voor correcte markdown rendering
+    avatar = "🧑" if role == "user" else "🤖"
+    with st.chat_message(role, avatar=avatar):
+        st.markdown(content)
+        # Toon bronvermelding als die er is
+        if sources and role == "assistant":
+            st.markdown("---")
+            st.markdown("**Onderbouwing:**")
+            for source in sources:
+                st.caption(f"• {source}")
 
-    st.markdown(f"""
-    <div class="chat-message {css_class}">
-        <div class="role">{role_label}</div>
-        <div class="content">{content}</div>
-    </div>
-    """, unsafe_allow_html=True)
+
+def extract_onderbouwing_from_response(response: str) -> tuple:
+    """
+    Extraheer de ONDERBOUWING sectie uit het AI-antwoord.
+
+    De AI is geïnstrueerd om zijn antwoord te eindigen met:
+    ONDERBOUWING:
+    - document1.pdf
+    - document2.pdf
+
+    Args:
+        response: Het AI-gegenereerde antwoord
+
+    Returns:
+        Tuple van (cleaned_response, used_sources)
+        - cleaned_response: Antwoord zonder de ONDERBOUWING sectie
+        - used_sources: Lijst van documentnamen
+    """
+    if not response:
+        return response, []
+
+    # Zoek naar de ONDERBOUWING sectie (case-insensitive)
+    import re
+    pattern = r'\n*ONDERBOUWING:\s*(.*)$'
+    match = re.search(pattern, response, re.IGNORECASE | re.DOTALL)
+
+    if not match:
+        return response, []
+
+    # Haal het deel voor ONDERBOUWING
+    onderbouwing_start = match.start()
+    cleaned_response = response[:onderbouwing_start].strip()
+
+    # Parse de bronnen uit de ONDERBOUWING sectie
+    onderbouwing_text = match.group(1).strip()
+
+    # Check voor "Geen documenten gebruikt" of vergelijkbaar
+    if "geen" in onderbouwing_text.lower():
+        return cleaned_response, []
+
+    # Zoek naar document namen (elke regel die begint met - of *)
+    sources = []
+    for line in onderbouwing_text.split('\n'):
+        line = line.strip()
+        if line.startswith('-') or line.startswith('*') or line.startswith('•'):
+            source = line.lstrip('-*• ').strip()
+            if source:
+                sources.append(source)
+        elif line and not line.startswith('ONDERBOUWING'):
+            # Soms zonder bullets
+            sources.append(line)
+
+    return cleaned_response, sources
 
 
-def render_chat_tab(selected_id: str, school_invulling: SchoolInvulling):
+def _process_chat_message(
+    vraag: str,
+    vraag_type: str,
+    selected_id: str,
+    school_invulling,
+    document_text: str = None,
+    document_filename: str = None,
+    rag_context: str = None,
+):
+    """
+    Verwerk een chat bericht en genereer een antwoord.
+
+    Dit is een interne functie die zowel door de chat knop als door
+    auto-triggers (bijv. vanuit suggesties) aangeroepen kan worden.
+    """
+    # Voeg user bericht toe aan weergave
+    st.session_state.messages.append({"role": "user", "content": vraag})
+
+    # Placeholder voor streaming response
+    with st.spinner(""):
+        response_placeholder = st.empty()
+        response_buffer = ""
+
+        def handle_chunk(chunk: str):
+            nonlocal response_buffer
+            response_buffer += chunk
+            # Gebruik markdown voor streaming (zonder complexe HTML)
+            response_placeholder.markdown(response_buffer)
+
+        # Genereer antwoord met error handling
+        try:
+            assistent = get_assistent()
+            antwoord = assistent.chat(
+                eis_id=selected_id,
+                school_invulling=school_invulling,
+                vraag=vraag,
+                vraag_type=vraag_type,
+                stream_handler=handle_chunk,
+                document_text=document_text,
+                document_filename=document_filename,
+                rag_context=rag_context,
+            )
+        except RuntimeError as e:
+            st.error(str(e))
+            # Verwijder het user bericht weer uit de lijst
+            st.session_state.messages.pop()
+            return
+
+    # Extraheer ONDERBOUWING sectie uit het antwoord (als RAG actief was)
+    used_sources = []
+    display_content = antwoord
+    if rag_context:
+        display_content, used_sources = extract_onderbouwing_from_response(antwoord)
+
+    # Voeg assistant bericht toe (met bronnen indien beschikbaar)
+    message_data = {"role": "assistant", "content": display_content}
+    if used_sources:
+        message_data["sources"] = used_sources
+    st.session_state.messages.append(message_data)
+
+    # Rerun om UI te updaten
+    st.rerun()
+
+
+def render_chat_tab(
+    selected_id: str,
+    school_invulling: SchoolInvulling,
+    document_text: str = None,
+    document_filename: str = None,
+    rag_context: str = None,
+):
     """Render de chat tab."""
     st.markdown("### Chat met Kwaliteitszorg AI")
 
+    # Check voor auto-chat trigger (van suggesties "Wat kan ik nu doen?")
+    auto_trigger = st.session_state.get("auto_chat_trigger")
+    if st.session_state.get("switch_to_chat"):
+        st.info("💡 Vraag wordt automatisch verstuurd...")
+        # Clear de flags nu we ze gaan verwerken
+        st.session_state.pop("auto_chat_trigger", None)
+        st.session_state.pop("switch_to_chat", None)
+
+    # Toon context indicator
+    if rag_context:
+        st.info("Documentdatabank actief - relevante passages worden meegestuurd")
+    elif document_text:
+        st.info(f"Document gekoppeld: **{document_filename}**")
+
     # Toon bestaande berichten
     for msg in st.session_state.messages:
-        render_chat_message(msg["role"], msg["content"])
+        render_chat_message(msg["role"], msg["content"], msg.get("sources"))
+
+    # Verwerk auto-trigger als aanwezig
+    if auto_trigger:
+        _process_chat_message(
+            vraag=auto_trigger["vraag"],
+            vraag_type=auto_trigger["type"],
+            selected_id=selected_id,
+            school_invulling=school_invulling,
+            document_text=document_text,
+            document_filename=document_filename,
+            rag_context=rag_context,
+        )
+        return  # Stop hier, rerun gebeurt in _process_chat_message
 
     # Chat input
     col_input, col_type = st.columns([3, 1])
@@ -311,39 +503,15 @@ def render_chat_tab(selected_id: str, school_invulling: SchoolInvulling):
         if not vraag.strip():
             st.warning("Typ eerst een vraag.")
         else:
-            # Voeg user bericht toe aan weergave
-            st.session_state.messages.append({"role": "user", "content": vraag})
-
-            # Placeholder voor streaming response
-            with st.spinner(""):
-                response_placeholder = st.empty()
-                response_buffer = ""
-
-                def handle_chunk(chunk: str):
-                    nonlocal response_buffer
-                    response_buffer += chunk
-                    response_placeholder.markdown(f"""
-                    <div class="chat-message assistant">
-                        <div class="role">Kwaliteitszorg AI</div>
-                        <div class="content">{response_buffer}</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-
-                # Genereer antwoord
-                assistent = get_assistent()
-                antwoord = assistent.chat(
-                    eis_id=selected_id,
-                    school_invulling=school_invulling,
-                    vraag=vraag,
-                    vraag_type=vraag_type,
-                    stream_handler=handle_chunk,
-                )
-
-            # Voeg assistant bericht toe
-            st.session_state.messages.append({"role": "assistant", "content": antwoord})
-
-            # Rerun om input te clearen
-            st.rerun()
+            _process_chat_message(
+                vraag=vraag,
+                vraag_type=vraag_type,
+                selected_id=selected_id,
+                school_invulling=school_invulling,
+                document_text=document_text,
+                document_filename=document_filename,
+                rag_context=rag_context,
+            )
 
 
 def main():
@@ -356,6 +524,19 @@ def main():
 
     inject_css()
     init_session_state()
+
+    # Check Ollama verbinding bij eerste keer laden
+    if "ollama_checked" not in st.session_state:
+        from config.settings import check_ollama_connection
+        success, message = check_ollama_connection()
+        st.session_state.ollama_checked = True
+        st.session_state.ollama_ok = success
+        st.session_state.ollama_message = message
+
+    if not st.session_state.ollama_ok:
+        st.error(f"**Ollama niet beschikbaar:** {st.session_state.ollama_message}")
+        st.info("Start Ollama en herlaad deze pagina.")
+        st.stop()
 
     database = get_database()
     eisen = database.get("deugdelijkheidseisen", {})
@@ -425,12 +606,13 @@ def main():
     # Widget version wordt verhoogd bij suggestie-acceptatie om widgets te resetten
     v = st.session_state.widget_version
 
-    # Velden onder elkaar met grotere hoogte
+    # Velden onder elkaar met grotere hoogte en karakterlimiet
     ambitie = st.text_area(
         "Ambitie",
         value=st.session_state.input_ambitie,
         placeholder="Wat wil jullie school bereiken?",
         height=150,
+        max_chars=settings.MAX_INPUT_CHARS,
         key=f"widget_ambitie_{v}",
     )
     st.session_state.input_ambitie = ambitie
@@ -440,6 +622,7 @@ def main():
         value=st.session_state.input_resultaat,
         placeholder="Welke concrete doelen?",
         height=150,
+        max_chars=settings.MAX_INPUT_CHARS,
         key=f"widget_resultaat_{v}",
     )
     st.session_state.input_resultaat = beoogd_resultaat
@@ -449,6 +632,7 @@ def main():
         value=st.session_state.input_acties,
         placeholder="Welke stappen ondernemen jullie?",
         height=180,
+        max_chars=settings.MAX_INPUT_CHARS,
         key=f"widget_acties_{v}",
     )
     st.session_state.input_acties = concrete_acties
@@ -458,6 +642,7 @@ def main():
         value=st.session_state.input_meten,
         placeholder="Hoe meten jullie succes?",
         height=150,
+        max_chars=settings.MAX_INPUT_CHARS,
         key=f"widget_meten_{v}",
     )
     st.session_state.input_meten = wijze_van_meten
@@ -469,6 +654,77 @@ def main():
         concrete_acties=concrete_acties,
         wijze_van_meten=wijze_van_meten,
     )
+
+    # ========================================================================
+    # Document Context (RAG of enkel document)
+    # ========================================================================
+
+    # Initialiseer rag_context (altijd None tenzij RAG actief is)
+    rag_context = None
+    rag_active = False
+    rag_available_sources = []  # Bronnen die beschikbaar zijn voor de AI
+
+    if RAG_ENABLED:
+        with st.expander("Documentdatabank beheren", expanded=False):
+            render_document_databank()
+
+        # RAG toggle en context ophalen
+        rag_active, rag_context, rag_available_sources = render_rag_toggle(selected_id, eis)
+
+        if rag_active and rag_context:
+            # RAG is actief, geen single document nodig
+            st.markdown("---")
+        else:
+            # Toon single document upload als alternatief
+            st.markdown("### Of: enkel document koppelen")
+            st.caption("Als alternatief voor de documentdatabank kun je ook een enkel document uploaden.")
+    else:
+        st.markdown("### Beleidsdocument koppelen (optioneel)")
+
+    # Single document upload (alleen tonen als RAG niet actief is)
+    if not (rag_active and rag_context):
+        uploaded_file = st.file_uploader(
+            "Upload een PDF document",
+            type=settings.ALLOWED_DOCUMENT_TYPES,
+            help="Upload bijv. een taalbeleid, veiligheidsplan of ander beleidsdocument. "
+                 "De AI gebruikt dit als context voor betere, specifiekere feedback.",
+            key="document_uploader",
+        )
+
+        # Verwerk geüpload document
+        if uploaded_file is not None:
+            # Check of dit een nieuw bestand is
+            if st.session_state.document_filename != uploaded_file.name:
+                with st.spinner("Document verwerken..."):
+                    result = extract_text_from_pdf(
+                        file_bytes=uploaded_file.read(),
+                        filename=uploaded_file.name,
+                    )
+
+                    if result.success:
+                        st.session_state.document_text = result.text
+                        st.session_state.document_filename = result.filename
+
+                        # Toon document info
+                        status_msg = f"Document geladen: {result.page_count} pagina's, {result.char_count:,} karakters"
+                        if result.truncated:
+                            status_msg += " (ingekort)"
+                        st.success(status_msg)
+                    else:
+                        st.error(result.error)
+                        st.session_state.document_text = None
+                        st.session_state.document_filename = None
+
+        # Toon huidige document status en verwijder optie
+        if st.session_state.document_text:
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                st.caption(f"Gekoppeld: **{st.session_state.document_filename}**")
+            with col2:
+                if st.button("Verwijder", key="remove_document"):
+                    st.session_state.document_text = None
+                    st.session_state.document_filename = None
+                    st.rerun()
 
     st.markdown("---")
 
@@ -532,12 +788,31 @@ def main():
             chat_tabs = st.tabs(["Chat", "Suggesties"])
 
             with chat_tabs[0]:
-                render_chat_tab(selected_id, school_invulling)
+                render_chat_tab(
+                    selected_id,
+                    school_invulling,
+                    document_text=st.session_state.document_text,
+                    document_filename=st.session_state.document_filename,
+                    rag_context=rag_context,
+                )
 
             with chat_tabs[1]:
-                render_suggesties_tab(selected_id, eis, school_invulling)
+                render_suggesties_tab(
+                    selected_id,
+                    eis,
+                    school_invulling,
+                    document_text=st.session_state.document_text,
+                    document_filename=st.session_state.document_filename,
+                    rag_context=rag_context,
+                )
         else:
-            render_chat_tab(selected_id, school_invulling)
+            render_chat_tab(
+                selected_id,
+                school_invulling,
+                document_text=st.session_state.document_text,
+                document_filename=st.session_state.document_filename,
+                rag_context=rag_context,
+            )
     # ========================================================================
 
 

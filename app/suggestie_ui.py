@@ -165,10 +165,99 @@ def render_veld_suggestie(veld: str, suggestie: VeldSuggestie) -> str:
     return None
 
 
+from typing import Optional, List
+
+
+def render_context_vragen(eis: dict, eis_id: str) -> Dict[str, str]:
+    """
+    Render de contextvragen voor een eis en return de antwoorden.
+
+    Args:
+        eis: De eisdata met eventuele context_vragen
+        eis_id: ID van de eis (voor unieke session state keys)
+
+    Returns:
+        Dict met vraag_id -> antwoord mappings
+    """
+    vragen = eis.get("context_vragen", [])
+    if not vragen:
+        return {}
+
+    # Initialiseer session state voor context antwoorden als dat nog niet is gebeurd
+    context_key = f"school_context_{eis_id}"
+    if context_key not in st.session_state:
+        st.session_state[context_key] = {}
+
+    st.markdown("#### Context over jullie school")
+    st.caption(
+        "Deze informatie helpt de AI gerichtere suggesties te geven. "
+        "Vul in wat je weet - alles is optioneel."
+    )
+
+    antwoorden = {}
+
+    for vraag in vragen:
+        vraag_id = vraag["id"]
+        input_key = f"context_input_{eis_id}_{vraag_id}"
+
+        # Haal eventueel opgeslagen waarde op
+        default_value = st.session_state[context_key].get(vraag_id, "")
+
+        antwoord = st.text_input(
+            vraag["vraag"],
+            value=default_value,
+            placeholder=vraag.get("placeholder", ""),
+            key=input_key,
+            help=f"Optioneel - helpt de AI betere suggesties te geven"
+        )
+
+        if antwoord and antwoord.strip():
+            antwoorden[vraag_id] = antwoord.strip()
+            # Sla op in session state voor persistentie
+            st.session_state[context_key][vraag_id] = antwoord.strip()
+        elif vraag_id in st.session_state[context_key]:
+            # Verwijder als leeggemaakt
+            del st.session_state[context_key][vraag_id]
+
+    st.markdown("---")
+
+    return antwoorden
+
+
+def _build_school_context_text(antwoorden: Dict[str, str], vragen: list) -> str:
+    """
+    Bouw een leesbare context tekst van de school-antwoorden.
+
+    Args:
+        antwoorden: Dict met vraag_id -> antwoord
+        vragen: Lijst van vraag-objecten uit de database
+
+    Returns:
+        Geformatteerde context string voor de prompt
+    """
+    if not antwoorden:
+        return ""
+
+    # Maak een mapping van vraag_id naar vraag tekst
+    vraag_teksten = {v["id"]: v["vraag"] for v in vragen}
+
+    lines = []
+    for vraag_id, antwoord in antwoorden.items():
+        vraag_tekst = vraag_teksten.get(vraag_id, vraag_id)
+        # Verwijder het vraagteken en "jullie" voor kortere weergave
+        vraag_kort = vraag_tekst.rstrip("?").replace("jullie ", "")
+        lines.append(f"- {vraag_kort}: {antwoord}")
+
+    return "\n".join(lines)
+
+
 def render_suggesties_tab(
     eis_id: str,
     eis: dict,
     school_invulling: SchoolInvulling,
+    document_text: Optional[str] = None,
+    document_filename: Optional[str] = None,
+    rag_context: Optional[str] = None,
 ):
     """
     Render de volledige suggesties tab.
@@ -177,6 +266,9 @@ def render_suggesties_tab(
         eis_id: ID van de deugdelijkheidseis
         eis: De eisdata
         school_invulling: Huidige invulling
+        document_text: Optioneel - tekst uit gekoppeld beleidsdocument
+        document_filename: Optioneel - naam van het beleidsdocument
+        rag_context: Optioneel - context van RAG-opgehaalde passages
     """
     render_suggestie_css()
 
@@ -186,6 +278,39 @@ def render_suggesties_tab(
         "Je kunt elke suggestie accepteren of weigeren."
     )
 
+    # Toon context indicator
+    if rag_context:
+        st.info("Documentdatabank actief - suggesties worden gebaseerd op relevante passages")
+    elif document_text:
+        st.info(f"Beleidsdocument gekoppeld: **{document_filename}** - suggesties worden hierop gebaseerd")
+
+    # === SCHOOL CONTEXT VRAGEN ===
+    # Toon contextvragen als de eis deze heeft
+    context_vragen = eis.get("context_vragen", [])
+    context_antwoorden = {}
+    school_context_text = None
+
+    if context_vragen:
+        context_antwoorden = render_context_vragen(eis, eis_id)
+        if context_antwoorden:
+            school_context_text = _build_school_context_text(context_antwoorden, context_vragen)
+
+    # === QUERY VERRIJKING TOGGLE ===
+    # Toon alleen als er RAG context EN school context is
+    enrich_query = False
+    if rag_context and school_context_text:
+        enrich_query = st.toggle(
+            "Query verrijking",
+            value=st.session_state.get("enrich_query_enabled", False),
+            key="enrich_query_toggle",
+            help="Verrijk de zoekquery met jullie schoolcontext voor relevantere documentpassages. "
+                 "Dit doet een extra AI-aanroep en kan iets langer duren."
+        )
+        st.session_state.enrich_query_enabled = enrich_query
+
+        if enrich_query:
+            st.caption("De AI zal de zoekquery aanpassen op basis van jullie schoolcontext.")
+
     # Check of er al suggesties zijn
     if "suggestie_resultaat" not in st.session_state:
         st.session_state.suggestie_resultaat = None
@@ -194,10 +319,29 @@ def render_suggesties_tab(
     if st.button("Genereer suggesties", type="primary", use_container_width=True):
         generator = SuggestieGenerator()
 
-        with st.spinner("AI analyseert je invulling..."):
+        spinner_text = "AI analyseert je invulling..."
+        if enrich_query:
+            spinner_text = "AI verrijkt zoekquery en analyseert documenten..."
+        elif school_context_text:
+            spinner_text = "AI analyseert je invulling met jullie schoolcontext..."
+        if rag_context and not enrich_query:
+            spinner_text = "AI analyseert je invulling en documentdatabank..."
+        elif document_text:
+            spinner_text = "AI analyseert je invulling en beleidsdocument..."
+
+        # Haal geselecteerde document IDs op voor gefilterde retrieval
+        selected_doc_ids = st.session_state.get("rag_selected_docs", None)
+
+        with st.spinner(spinner_text):
             resultaat = generator.genereer_suggesties(
                 eis_id=eis_id,
                 school_invulling=school_invulling,
+                document_text=document_text,
+                document_filename=document_filename,
+                rag_context=rag_context,
+                school_context=school_context_text,
+                enrich_query=enrich_query,
+                selected_doc_ids=selected_doc_ids,
             )
 
             st.session_state.suggestie_resultaat = resultaat
@@ -242,3 +386,114 @@ def render_suggesties_tab(
             elif actie == "rejected":
                 st.session_state[f"suggestie_behandeld_{veld}"] = "rejected"
                 st.rerun()
+
+    # Toon onderbouwing (gebruikte bronnen - direct van de AI)
+    if resultaat.gebruikte_bronnen:
+        st.markdown("---")
+        st.markdown("**Onderbouwing:**")
+        st.caption("De volgende documenten zijn gebruikt voor deze suggesties:")
+        for source in resultaat.gebruikte_bronnen:
+            st.caption(f"• {source}")
+
+    # === WAT KAN IK NU DOEN? ===
+    render_vervolgacties(eis_id, eis)
+
+
+def render_vervolgacties(eis_id: str, eis: dict):
+    """
+    Render de 'Wat kan ik nu doen?' sectie met vervolgacties na suggesties.
+
+    Bij klik wordt de gebruiker naar de chat tab gestuurd met een automatische vraag.
+    """
+    st.markdown("---")
+    st.markdown("### Wat kan ik nu doen?")
+
+    # Check of er een pending actie is (voor visuele feedback)
+    if st.session_state.get("auto_chat_trigger"):
+        trigger = st.session_state.get("auto_chat_trigger")
+        actie_naam = {
+            "feedback": "Audit invulling",
+            "uitleg": "Uitleg eis",
+        }.get(trigger.get("type"), "Actie")
+        st.success(f"✓ **{actie_naam}** klaargezet! Klik op de **Chat** tab hierboven om het antwoord te zien.")
+        return
+
+    st.caption("Kies een vervolgactie om verder te gaan met de AI-assistent:")
+
+    # CSS voor de actie knoppen
+    st.markdown("""
+    <style>
+        .actie-knop {
+            background: linear-gradient(135deg, #F8FAFD 0%, #DCEEFA 100%);
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .actie-knop:hover {
+            border-color: #4599D5;
+            box-shadow: 0 2px 8px rgba(69, 153, 213, 0.15);
+        }
+        .actie-titel {
+            font-weight: 600;
+            color: #14194A;
+            margin-bottom: 0.25rem;
+        }
+        .actie-beschrijving {
+            font-size: 0.85rem;
+            color: #496580;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        if st.button(
+            "📋 Audit mijn invulling",
+            key="actie_audit",
+            use_container_width=True,
+            help="Laat de AI je volledige invulling beoordelen met sterke punten en verbeterpunten"
+        ):
+            # Stel session state in voor auto-chat
+            st.session_state.auto_chat_trigger = {
+                "type": "feedback",
+                "vraag": f"Geef feedback op mijn invulling voor {eis_id}. Beoordeel alle vier de velden en geef concrete verbeterpunten.",
+            }
+            st.session_state.switch_to_chat = True
+            st.rerun()
+
+    with col2:
+        if st.button(
+            "💡 Leg deze eis uit",
+            key="actie_uitleg",
+            use_container_width=True,
+            help="Krijg uitleg over wat deze eis inhoudt en hoe je invulling hier bij past"
+        ):
+            st.session_state.auto_chat_trigger = {
+                "type": "uitleg",
+                "vraag": f"Leg uit wat eis {eis_id} ({eis.get('titel', '')}) precies inhoudt en hoe onze huidige invulling hieraan voldoet.",
+            }
+            st.session_state.switch_to_chat = True
+            st.rerun()
+
+    with col3:
+        if st.button(
+            "📁 Maak kwaliteitsproject",
+            key="actie_project",
+            use_container_width=True,
+            help="Binnenkort beschikbaar: maak een verbeterproject aan op basis van de feedback",
+            disabled=True,  # Placeholder - nog niet geïmplementeerd
+        ):
+            st.info("Deze functie wordt binnenkort toegevoegd!")
+
+    # Toon beschrijvingen onder de knoppen
+    st.markdown("""
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 0.5rem;">
+        <div class="actie-beschrijving">Krijg een volledige beoordeling met oordeel, sterke punten en verbeterpunten</div>
+        <div class="actie-beschrijving">Begrijp de eis beter en zie hoe je invulling aansluit</div>
+        <div class="actie-beschrijving">Zet verbeterpunten om in een concreet actieplan (coming soon)</div>
+    </div>
+    """, unsafe_allow_html=True)
