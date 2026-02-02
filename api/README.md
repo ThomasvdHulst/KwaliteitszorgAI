@@ -529,22 +529,3 @@ api/
 ```
 
 ---
-
-## Performance
-
-- **Response tijd**: 10-60 seconden afhankelijk van vraaglengte en serverspecificaties
-- **Aanbevolen hardware**: Server met GPU (NVIDIA) voor snellere inference
-- **Zonder GPU**: Werkt ook op CPU, maar langzamer
-
-### Tips voor productie
-
-1. Gebruik een server met GPU voor acceptable response times
-2. Overweeg een kleiner model (bijv. `gemma3:12b`) voor snellere responses
-3. Implementeer caching in Laravel voor veelgestelde vragen
-4. Gebruik queue workers in Laravel voor async verwerking
-
----
-
-## Vragen?
-
-Neem contact op met het development team.

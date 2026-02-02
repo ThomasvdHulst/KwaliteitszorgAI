@@ -52,3 +52,15 @@ htmlcov/
 .coverage
 .coverage.*
 .pytest_cache/
+
+# Large files / Documents
+*.mov
+*.mp4
+*.avi
+*.mkv
+*.pdf
+*.docx
+*.doc
+
+# Voorbeeldbeleid folder (contains PDFs)
+voorbeeldbeleid/
