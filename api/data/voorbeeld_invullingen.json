@@ -135,6 +135,168 @@
         "concrete_acties": "We hebben talentklassen en leerlingen kunnen extra vakken volgen. Sporters krijgen een aangepast rooster.",
         "wijze_van_meten": "We kijken of leerlingen tevreden zijn."
       }
+    },
+    "OP 4.1": {
+      "titel": "Verplichte onderwijstijd",
+      "goed": {
+        "niveau": "goed",
+        "omschrijving": "Volledige invulling met concrete urennormen, marge, monitoring en evaluatie",
+        "ambitie": "Onze school biedt een onderwijsprogramma dat ruimschoots voldoet aan de wettelijk verplichte onderwijstijd. We roosteren met een marge boven de norm om lesuitval op te kunnen vangen. We monitoren actief of de geplande én gerealiseerde onderwijstijd voldoende is.",
+        "beoogd_resultaat": "We voldoen aan de wettelijke urennorm (minimaal 3700 uur in de eerste twee leerjaren, 4700 uur in de eerste vier leerjaren, en 5700 uur over de hele opleiding). De geroosterde onderwijstijd ligt minimaal 5% boven de wettelijke norm om lesuitval op te vangen. Minimaal 95% van de geplande onderwijstijd wordt daadwerkelijk gerealiseerd.",
+        "concrete_acties": "De roostermaker stelt jaarlijks een rooster op dat voldoet aan de wettelijke urennorm plus een marge van 5%. Per afdeling wordt berekend hoeveel uren worden aangeboden. Alle onderwijsactiviteiten tellen mee: reguliere lessen, excursies, werkweken, projectweken, stages en LOB-activiteiten. Bij lesuitval wordt actief gezocht naar vervanging. Bij structurele uitval (langdurige ziekte docent) wordt het rooster aangepast. We registreren alle uitgevallen lessen in Magister. De roostercoördinator rapporteert elk kwartaal over de gerealiseerde onderwijstijd aan de directie.",
+        "wijze_van_meten": "De roostercoördinator maakt aan het begin van het jaar een berekening van de geroosterde onderwijstijd per afdeling en vergelijkt dit met de wettelijke norm. Elk kwartaal wordt geanalyseerd hoeveel lessen zijn uitgevallen en of de gerealiseerde onderwijstijd nog op koers ligt. Aan het einde van het jaar maken we een eindberekening per afdeling. Bij knelpunten worden maatregelen genomen voor het volgende schooljaar."
+      },
+      "gemiddeld": {
+        "niveau": "gemiddeld",
+        "omschrijving": "Voldoet waarschijnlijk aan de norm maar mist monitoring of marge",
+        "ambitie": "We willen voldoen aan de wettelijke onderwijstijd.",
+        "beoogd_resultaat": "Leerlingen krijgen voldoende uren onderwijs.",
+        "concrete_acties": "De roostermaker maakt elk jaar een rooster. We proberen lesuitval te beperken. Als een docent ziek is zoeken we vervanging.",
+        "wijze_van_meten": "We gaan ervan uit dat het rooster voldoet aan de norm."
+      },
+      "zwak": {
+        "niveau": "zwak",
+        "omschrijving": "Geen aantoonbare naleving, geen monitoring, geen berekening",
+        "ambitie": "We geven les aan leerlingen.",
+        "beoogd_resultaat": "Leerlingen krijgen les.",
+        "concrete_acties": "We hebben een rooster.",
+        "wijze_van_meten": "We kijken niet specifiek naar het aantal uren."
+      }
+    },
+    "OP 4.3": {
+      "titel": "Verdeling onderwijstijd over vakken",
+      "goed": {
+        "niveau": "goed",
+        "omschrijving": "Evenwichtige lessentabel met helder proces, betrokkenheid secties en onderbouwde keuzes",
+        "ambitie": "Onze school heeft een evenwichtige lessentabel die aansluit bij de behoeften van alle vakken en de leerlingpopulatie. De verdeling van uren is het resultaat van een zorgvuldig proces waarbij alle vakgroepen worden betrokken. We kunnen onze keuzes onderbouwen.",
+        "beoogd_resultaat": "We hebben een lessentabel waarin elk vak voldoende uren krijgt om het curriculum te kunnen afronden. De verdeling is afgestemd op de kerndoelen en eindtermen. Alle vakgroepen kunnen zich vinden in de verdeling. De lessentabel wordt jaarlijks geëvalueerd en waar nodig bijgesteld.",
+        "concrete_acties": "De directie stelt jaarlijks de lessentabel vast na consultatie van de secties. Elke sectie kan een onderbouwd voorstel indienen voor het aantal uren. Bij de verdeling houden we rekening met: kerndoelen en eindtermen, exameneisen, de leerlingpopulatie, en beschikbare formatie. De keuzes worden vastgelegd en gecommuniceerd naar het team. Bij wijzigingen in wetgeving of examenprogramma's wordt de lessentabel herijkt. De MR heeft instemmingsrecht op de lessentabel.",
+        "wijze_van_meten": "Jaarlijks evalueren we met de secties of de toegekende uren toereikend zijn. We analyseren de examenresultaten per vak en betrekken dit bij de evaluatie. Bij structurele knelpunten (bijv. een vak dat consequent slechter scoort) onderzoeken we of dit samenhangt met de urenverdeling. De evaluatie wordt besproken in het MT en vastgelegd."
+      },
+      "gemiddeld": {
+        "niveau": "gemiddeld",
+        "omschrijving": "Er is een lessentabel maar het proces is onduidelijk of secties worden niet betrokken",
+        "ambitie": "We willen een goede verdeling van uren over de vakken.",
+        "beoogd_resultaat": "Elk vak krijgt voldoende uren om het programma af te ronden.",
+        "concrete_acties": "We hebben een lessentabel die de directie jaarlijks vaststelt. Bij grote wijzigingen worden de secties geïnformeerd.",
+        "wijze_van_meten": "Als secties klagen over te weinig uren kijken we ernaar."
+      },
+      "zwak": {
+        "niveau": "zwak",
+        "omschrijving": "Geen proces, geen onderbouwing, lessentabel is historisch gegroeid",
+        "ambitie": "Vakken krijgen uren.",
+        "beoogd_resultaat": "Er is een lessentabel.",
+        "concrete_acties": "De lessentabel is al jaren hetzelfde. We passen het aan als het moet.",
+        "wijze_van_meten": "We evalueren de lessentabel niet."
+      }
+    },
+    "OP 4.4": {
+      "titel": "Verzuimbeleid",
+      "goed": {
+        "niveau": "goed",
+        "omschrijving": "Volledig verzuimbeleid met preventie, registratie, aanpak en samenwerking leerplicht",
+        "ambitie": "Onze school streeft naar maximale aanwezigheid van alle leerlingen. We hebben een actief verzuimbeleid dat zowel preventief als curatief werkt. We signaleren verzuim vroegtijdig en pakken het direct aan, in goede samenwerking met ouders en de leerplichtambtenaar.",
+        "beoogd_resultaat": "Het gemiddelde verzuimpercentage ligt onder de 5%. Ongeoorloofd verzuim wordt binnen 3 dagen gesignaleerd en aangepakt. Bij 16 uur ongeoorloofd verzuim in 4 weken wordt tijdig gemeld bij de leerplichtambtenaar. We hebben geen vroegtijdig schoolverlaters zonder passende vervolgbestemming.",
+        "concrete_acties": "Docenten registreren aanwezigheid in het eerste lesuur in Magister. De verzuimcoördinator controleert dagelijks de registratie en belt bij ongemeld verzuim dezelfde dag de ouders. Bij herhaald verzuim volgt een gesprek met leerling, ouders en mentor. We hanteren een verzuimprotocol met duidelijke stappen: signaleren, gesprek, contract, melding leerplicht. Bij 16 uur ongeoorloofd verzuim in 4 weken melden we bij de leerplichtambtenaar. We werken preventief aan binding: mentorgesprekken, betrokkenheid bij school, en signalering van risicofactoren. Bij dreigende uitval schakelen we tijdig het zorgteam in.",
+        "wijze_van_meten": "De verzuimcoördinator rapporteert maandelijks de verzuimcijfers aan de directie. We analyseren patronen: welke leerlingen, welke klassen, welke dagen. Halfjaarlijks evalueren we het verzuimbeleid in het team. We monitoren het aantal meldingen aan leerplicht en het aantal voortijdig schoolverlaters. Bij hoge verzuimcijfers analyseren we oorzaken en stellen we het beleid bij."
+      },
+      "gemiddeld": {
+        "niveau": "gemiddeld",
+        "omschrijving": "Er is verzuimregistratie maar aanpak is reactief of niet systematisch",
+        "ambitie": "We willen dat leerlingen naar school komen en verzuim beperken.",
+        "beoogd_resultaat": "Leerlingen zijn aanwezig op school. Ongeoorloofd verzuim wordt aangepakt.",
+        "concrete_acties": "Docenten registreren aanwezigheid in Magister. Bij veel verzuim wordt de mentor ingeschakeld. We melden bij leerplicht als het moet.",
+        "wijze_van_meten": "We kijken naar de verzuimcijfers als er problemen zijn."
+      },
+      "zwak": {
+        "niveau": "zwak",
+        "omschrijving": "Geen systematische registratie, reactieve aanpak, onduidelijk beleid",
+        "ambitie": "Leerlingen moeten naar school komen.",
+        "beoogd_resultaat": "Leerlingen zijn aanwezig.",
+        "concrete_acties": "Docenten nemen de aanwezigheid op. Als iemand er vaak niet is, merken we dat.",
+        "wijze_van_meten": "We hebben geen specifieke monitoring."
+      }
+    },
+    "OP 6.1": {
+      "titel": "Voorbereiding op de afsluiting van het onderwijs",
+      "goed": {
+        "niveau": "goed",
+        "omschrijving": "Concrete voorbereidingsactiviteiten, meerdimensionaal, voor alle leerlingen, eenduidige aanpak",
+        "ambitie": "Onze school bereidt alle leerlingen optimaal voor op de afsluiting van hun opleiding. We bieden naast de reguliere lessen specifieke voorbereidingsactiviteiten aan die leerlingen inhoudelijk, procesmatig en sociaal-emotioneel klaarstomen voor hun examens.",
+        "beoogd_resultaat": "Alle examenleerlingen voelen zich goed voorbereid op hun examens. Minimaal 90% van de leerlingen geeft aan te weten wat ze kunnen verwachten. Het slagingspercentage ligt boven het landelijk gemiddelde. Leerlingen ervaren de examenperiode als overzichtelijk en behapbaar.",
+        "concrete_acties": "We organiseren in het voorexamenjaar een voorlichtingsbijeenkomst over het PTA en de examenplanning. In de examenklassen zijn er specifieke examentrainingen: oude examens maken, tijdsplanning oefenen, en examenstress bespreken. Elke sectie heeft afgestemd hoe leerlingen worden voorbereid op het centraal examen. De mentor bespreekt met leerlingen hun examenvakken en studieplanning. We bieden workshops aan over omgaan met examenstress. Leerlingen met extra ondersteuningsbehoeften krijgen een aangepaste voorbereiding. Er is een duidelijke kalender met alle examenmomenten en voorbereidingsactiviteiten.",
+        "wijze_van_meten": "Na de examenperiode evalueren we met leerlingen hoe zij de voorbereiding hebben ervaren. We analyseren de slagingspercentages en vergelijken met voorgaande jaren. Secties evalueren of hun examenvoorbereiding effectief was. Bij tegenvallende resultaten analyseren we of de voorbereiding verbeterd kan worden."
+      },
+      "gemiddeld": {
+        "niveau": "gemiddeld",
+        "omschrijving": "Er is enige voorbereiding maar niet systematisch of alleen inhoudelijk",
+        "ambitie": "We willen leerlingen goed voorbereiden op hun examens.",
+        "beoogd_resultaat": "Leerlingen zijn voorbereid op hun examens en halen goede resultaten.",
+        "concrete_acties": "Docenten besteden in de examenklassen aandacht aan examenvoorbereiding. Leerlingen maken oude examens. Er is een rooster voor de schoolexamens.",
+        "wijze_van_meten": "We kijken naar de slagingspercentages."
+      },
+      "zwak": {
+        "niveau": "zwak",
+        "omschrijving": "Geen specifieke voorbereiding, alleen reguliere lessen",
+        "ambitie": "Leerlingen doen examen.",
+        "beoogd_resultaat": "Leerlingen slagen voor hun examen.",
+        "concrete_acties": "We geven les tot het examen begint.",
+        "wijze_van_meten": "We kijken hoeveel leerlingen slagen."
+      }
+    },
+    "OP 6.2": {
+      "titel": "Examencommissie",
+      "goed": {
+        "niveau": "goed",
+        "omschrijving": "Onafhankelijke, deskundige commissie met brede taakopvatting en duidelijke werkwijze",
+        "ambitie": "Onze examencommissie borgt de kwaliteit van de toetsing en examinering op school. De commissie opereert onafhankelijk, is deskundig en voert alle wettelijke taken uit. De commissie is een belangrijke pijler in onze examenkwaliteit.",
+        "beoogd_resultaat": "De examencommissie bestaat uit minimaal 3 deskundige leden die onafhankelijk kunnen opereren. De commissie voert alle wettelijke taken uit: opstellen concept-PTA en examenreglement, adviseren over onregelmatigheden, en borgen van examenkwaliteit. De werkwijze is vastgelegd en wordt jaarlijks geëvalueerd.",
+        "concrete_acties": "De examencommissie bestaat uit drie leden: de examensecretaris, een docent uit de bovenbouw en een lid van de schoolleiding. De commissie stelt jaarlijks het concept-PTA en examenreglement op en legt deze voor aan de MR. Bij vermoeden van onregelmatigheden adviseert de commissie de directie over te nemen maatregelen. De commissie controleert steekproefsgewijs de kwaliteit van schoolexamens. Jaarlijks evalueert de commissie het verloop van de examens en doet aanbevelingen voor het volgende jaar. De taken en werkwijze zijn vastgelegd in een reglement.",
+        "wijze_van_meten": "De examencommissie maakt jaarlijks een verslag van haar werkzaamheden. Dit verslag bevat: het aantal behandelde casussen, de gegeven adviezen, de uitgevoerde controles, en aanbevelingen voor verbetering. De directie bespreekt het verslag en neemt waar nodig maatregelen. We evalueren of de commissie alle wettelijke taken heeft uitgevoerd."
+      },
+      "gemiddeld": {
+        "niveau": "gemiddeld",
+        "omschrijving": "Er is een commissie maar taken zijn beperkt of onafhankelijkheid is onduidelijk",
+        "ambitie": "We hebben een examencommissie die de examens bewaakt.",
+        "beoogd_resultaat": "De examencommissie behandelt onregelmatigheden en adviseert de directie.",
+        "concrete_acties": "De examencommissie bestaat uit de examensecretaris en twee docenten. Ze komen bijeen als er onregelmatigheden zijn. Het PTA wordt door de secties gemaakt.",
+        "wijze_van_meten": "We evalueren of er problemen waren met de examens."
+      },
+      "zwak": {
+        "niveau": "zwak",
+        "omschrijving": "Geen echte commissie, taken onduidelijk of niet uitgevoerd",
+        "ambitie": "We hebben iemand die over examens gaat.",
+        "beoogd_resultaat": "De examens verlopen goed.",
+        "concrete_acties": "De examensecretaris regelt de examens. Bij problemen wordt de directie ingeschakeld.",
+        "wijze_van_meten": "We weten niet precies wat de examencommissie doet."
+      }
+    },
+    "OP 6.3": {
+      "titel": "PTA en examenreglement",
+      "goed": {
+        "niveau": "goed",
+        "omschrijving": "Volledig PTA en examenreglement, alle wettelijke onderdelen, tijdig gecommuniceerd",
+        "ambitie": "Onze school heeft een volledig en helder PTA en examenreglement die voldoen aan alle wettelijke eisen. Leerlingen en ouders weten precies wat ze kunnen verwachten: welke toetsen, wanneer, hoe zwaar ze wegen, wat de regels zijn en wat de gevolgen zijn bij overtreding.",
+        "beoogd_resultaat": "Het PTA bevat alle wettelijke onderdelen: toetsvorm, weging, te toetsen domeinen, inhoudsbeschrijving, status van de stof (SE/CE/eigen keuze) en planning. Het examenreglement beschrijft alle regels, herkansingsmogelijkheden en maatregelen bij onregelmatigheden. Beide documenten worden voor 1 oktober aan leerlingen en ouders verstrekt.",
+        "concrete_acties": "De examencommissie stelt jaarlijks het concept-PTA en examenreglement op in samenwerking met de secties. Elke sectie levert een volledig ingevuld PTA-format aan met alle verplichte onderdelen. De examencommissie controleert op volledigheid en consistentie. Het PTA en examenreglement worden ter instemming voorgelegd aan de MR. Voor 1 oktober ontvangen alle examenleerlingen en hun ouders het PTA en examenreglement digitaal. In een voorlichtingsbijeenkomst worden de documenten toegelicht. Bij wijzigingen gedurende het jaar worden leerlingen en ouders direct geïnformeerd.",
+        "wijze_van_meten": "De examencommissie controleert jaarlijks of alle PTA's volledig zijn ingevuld (checklist met wettelijke onderdelen). We registreren of het PTA en examenreglement tijdig (voor 1 oktober) zijn verstrekt. Na de examenperiode evalueren we of er onduidelijkheden waren die terug te voeren zijn op het PTA of examenreglement. Feedback van leerlingen over de duidelijkheid wordt meegenomen."
+      },
+      "gemiddeld": {
+        "niveau": "gemiddeld",
+        "omschrijving": "PTA en examenreglement zijn aanwezig maar niet volledig of laat gecommuniceerd",
+        "ambitie": "We hebben een PTA en examenreglement voor onze examenleerlingen.",
+        "beoogd_resultaat": "Leerlingen weten welke toetsen ze krijgen en wat de regels zijn.",
+        "concrete_acties": "Elke sectie maakt een PTA. Het examenreglement staat op de website. Leerlingen krijgen het PTA aan het begin van het examenjaar.",
+        "wijze_van_meten": "We controleren of elke sectie een PTA heeft ingeleverd."
+      },
+      "zwak": {
+        "niveau": "zwak",
+        "omschrijving": "PTA onvolledig, examenreglement verouderd of niet gecommuniceerd",
+        "ambitie": "Er is een PTA.",
+        "beoogd_resultaat": "Leerlingen weten wanneer ze toetsen hebben.",
+        "concrete_acties": "Secties maken hun eigen PTA. Het examenreglement staat ergens op de website.",
+        "wijze_van_meten": "We controleren de PTA's niet systematisch."
+      }
     }
   }
 }
