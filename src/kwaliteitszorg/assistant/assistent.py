@@ -1,4 +1,8 @@
-"""DeugdelijkheidseisAssistent - Hoofdklasse voor de AI-assistent."""
+"""DeugdelijkheidseisAssistent - Hoofdklasse voor de AI-assistent.
+
+Dit is de centrale class voor alle AI-interacties in de Kwaliteitszorg applicatie.
+Ondersteunt chat met history, document context, en RAG integratie.
+"""
 
 from typing import Callable, Dict, List, Optional
 
@@ -7,20 +11,57 @@ import ollama
 from config import settings
 from config.settings import logger
 from ..models.school_invulling import SchoolInvulling
-from ..utils.database import load_database, load_deugdelijkheidseis
+from ..utils.database import DatabaseError, load_database, load_deugdelijkheidseis
 from .prompts import (
     SYSTEM_PROMPT,
-    get_task_instruction,
-    generate_document_salt,
     build_document_context,
     build_rag_context,
+    generate_document_salt,
+    get_task_instruction,
 )
 
 
-class DeugdelijkheidseisAssistent:
-    """AI-assistent voor hulp bij deugdelijkheidseisen."""
+class OllamaConnectionError(Exception):
+    """Exception wanneer Ollama niet bereikbaar is."""
 
-    def __init__(self, model: str = None, database_path: str = None):
+    pass
+
+
+class ModelNotFoundError(Exception):
+    """Exception wanneer het AI model niet gevonden wordt."""
+
+    pass
+
+
+class DeugdelijkheidseisAssistent:
+    """
+    AI-assistent voor hulp bij deugdelijkheidseisen.
+
+    Deze class beheert alle interacties met het LLM model voor:
+    - Feedback op schoolinvullingen
+    - Uitleg van eisen
+    - Suggesties voor verbeteringen
+    - Algemene vragen over deugdelijkheidseisen
+
+    Attributes:
+        model: Naam van het Ollama model
+        database_path: Pad naar de eisen database
+        database: Geladen database dictionary
+        chat_history: Lijst van vorige berichten in de conversatie
+        document_salt: Unieke salt voor prompt injection preventie
+    """
+
+    def __init__(self, model: Optional[str] = None, database_path: Optional[str] = None):
+        """
+        Initialiseer de assistent.
+
+        Args:
+            model: Optioneel Ollama model naam (default uit settings)
+            database_path: Optioneel pad naar database (default uit settings)
+
+        Raises:
+            DatabaseError: Als de database niet geladen kan worden
+        """
         self.model = model or settings.MODEL_NAME
         self.database_path = database_path or str(settings.DATABASE_PATH)
         self.database = load_database(self.database_path)
@@ -166,7 +207,21 @@ INVULLING VAN DE SCHOOL:
         messages: List[Dict],
         stream_handler: Optional[Callable[[str], None]],
     ) -> str:
-        """Genereer een antwoord via Ollama."""
+        """
+        Genereer een antwoord via Ollama.
+
+        Args:
+            messages: Lijst van chat berichten (system, user, assistant)
+            stream_handler: Optionele callback voor streaming output
+
+        Returns:
+            Het gegenereerde antwoord als string
+
+        Raises:
+            OllamaConnectionError: Als Ollama niet bereikbaar is
+            ModelNotFoundError: Als het model niet gevonden wordt
+            RuntimeError: Bij andere Ollama fouten
+        """
         options = {
             "temperature": settings.TEMPERATURE_DEFAULT,
             "num_predict": settings.MAX_GENERATE_TOKENS,
@@ -199,13 +254,13 @@ INVULLING VAN DE SCHOOL:
             error_msg = str(e).lower()
             if "connection refused" in error_msg or "connect" in error_msg:
                 logger.error("Ollama verbinding verloren: %s", e)
-                raise RuntimeError(
+                raise OllamaConnectionError(
                     "Kan geen verbinding maken met Ollama. "
                     "Controleer of Ollama draait met: ollama serve"
                 ) from e
             elif "not found" in error_msg:
                 logger.error("Model niet gevonden: %s", e)
-                raise RuntimeError(
+                raise ModelNotFoundError(
                     f"Model '{self.model}' niet gevonden. "
                     f"Installeer met: ollama pull {self.model}"
                 ) from e

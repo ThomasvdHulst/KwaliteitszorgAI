@@ -2,19 +2,49 @@
 
 Deze module biedt functionaliteit voor het verwerken van PDF documenten
 die scholen kunnen uploaden als context voor de AI-assistent.
+
+Features:
+- PDF tekst extractie via PyMuPDF
+- Automatische truncatie bij limieten
+- Page boundary tracking voor bronvermelding
+- Tekst cleaning en normalisatie
 """
 
 import re
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 from config import settings
 from config.settings import logger
 
 
+class PDFProcessingError(Exception):
+    """Exception voor PDF verwerkingsfouten."""
+
+    pass
+
+
+class PDFImportError(Exception):
+    """Exception wanneer PyMuPDF niet geïnstalleerd is."""
+
+    pass
+
+
 @dataclass
 class DocumentResult:
-    """Resultaat van document processing."""
+    """
+    Resultaat van document processing.
+
+    Attributes:
+        success: Of de verwerking succesvol was
+        text: De geëxtraheerde tekst
+        filename: Naam van het verwerkte bestand
+        page_count: Aantal verwerkte pagina's
+        char_count: Totaal aantal karakters
+        truncated: Of het document ingekort is
+        error: Foutmelding indien niet succesvol
+        page_boundaries: Lijst van (page_num, char_start, char_end) tuples
+    """
     success: bool
     text: str
     filename: str
@@ -22,7 +52,7 @@ class DocumentResult:
     char_count: int
     truncated: bool
     error: Optional[str] = None
-    page_boundaries: Optional[list] = None  # Lijst van (page_num, char_start, char_end)
+    page_boundaries: Optional[List[Tuple[int, int, int]]] = None
 
 
 def extract_text_from_pdf(
@@ -44,6 +74,10 @@ def extract_text_from_pdf(
 
     Returns:
         DocumentResult met geëxtraheerde tekst en metadata
+
+    Note:
+        Bij fouten wordt een DocumentResult met success=False geretourneerd,
+        geen exception geraised. Dit maakt error handling in de UI eenvoudiger.
     """
     try:
         import fitz  # PyMuPDF
@@ -56,7 +90,7 @@ def extract_text_from_pdf(
             page_count=0,
             char_count=0,
             truncated=False,
-            error="PDF verwerking niet beschikbaar. PyMuPDF ontbreekt."
+            error="PDF verwerking niet beschikbaar. Installeer PyMuPDF met: pip install PyMuPDF"
         )
 
     # Bij unlimited: gebruik zeer hoge limieten

@@ -177,6 +177,42 @@ def inject_css():
             border-radius: 8px 8px 0 0;
         }}
 
+        /* Sidebar selectbox dropdown fix - agressieve override */
+        /* Fix voor dropdown menu dat te ver naar links staat */
+        [data-baseweb="popover"] [data-baseweb="menu"],
+        [data-baseweb="select"] [data-baseweb="menu"],
+        [data-baseweb="popover"] ul[role="listbox"],
+        div[data-baseweb="popover"] > div {{
+            min-width: 280px !important;
+            width: max-content !important;
+            max-width: 90vw !important;
+        }}
+
+        /* Fix menu item padding en uitlijning */
+        [data-baseweb="menu"] li,
+        ul[role="listbox"] li,
+        [role="option"] {{
+            padding: 10px 16px !important;
+            text-align: left !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+        }}
+
+        /* Zorg dat tekst in dropdown zichtbaar is */
+        [data-baseweb="menu"] li > div,
+        [role="option"] > div {{
+            overflow: visible !important;
+            text-overflow: unset !important;
+            white-space: normal !important;
+        }}
+
+        /* Sidebar specifiek - voorkom dat dropdown buiten scherm valt */
+        [data-testid="stSidebar"] [data-baseweb="popover"] {{
+            left: 10px !important;
+            right: auto !important;
+            transform: none !important;
+        }}
+
         /* Floating AI Chat Button */
         .ai-chat-button {{
             position: fixed;
@@ -549,10 +585,19 @@ def main():
     with st.sidebar:
         st.markdown("### Instellingen")
         eis_ids = sorted(eisen.keys())
+
+        def format_eis_option(eis_id: str) -> str:
+            """Format eis voor dropdown - kort titel in als te lang."""
+            titel = eisen[eis_id].get('titel', '')
+            # Kort in tot max 30 karakters voor leesbaarheid in dropdown
+            if len(titel) > 30:
+                titel = titel[:27] + "..."
+            return f"{eis_id} - {titel}"
+
         selected_id = st.selectbox(
             "Deugdelijkheidseis",
             eis_ids,
-            format_func=lambda x: f"{x} - {eisen[x].get('titel', '')}",
+            format_func=format_eis_option,
         )
 
         # Reset chat als eis wijzigt

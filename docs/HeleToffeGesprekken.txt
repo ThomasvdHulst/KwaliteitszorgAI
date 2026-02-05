@@ -1,0 +1,73 @@
+Gesprek over OP 6.3: 
+Geef feedback op mijn invulling voor OP 6.3. Beoordeel alle vier de velden en geef concrete verbeterpunten.
+
+🤖
+Oordeel: Voldoende
+
+Sterke punten:
+
+Jullie ambitie is helder en geeft aan dat jullie streven naar een volledig en actueel PTA en examenreglement.
+Jullie benoemen de belangrijke rol van de examencommissie en de medezeggenschapsraad bij de vaststelling van het PTA en examenreglement.
+Jullie concrete acties zijn concreet en geven aan welke stappen er worden genomen om het PTA en examenreglement op te stellen en te publiceren.
+Jullie geven aan dat jullie controleren of het PTA en examenreglement tijdig beschikbaar zijn.
+Verbeterpunten:
+
+De ‘wijze van meten’ is nog te algemeen. Jullie geven aan dat jullie de volledigheid controleren, maar niet hoe dat precies gebeurt. Benoem concrete criteria of een checklist die jullie gebruiken.
+Hoewel jullie aangeven dat het PTA voldoet aan alle wettelijke eisen, missen jullie in de concrete acties de expliciete vermelding van welke wettelijke eisen. Verwijs naar de specifieke onderdelen die in het PTA moeten staan (zoals stofomschrijving, weging, domeinen, status SE/CE/eigen keuze, planning).
+Jullie geven aan dat de algemeen directeur bij afwijking van het voorstel van de examencommissie een schriftelijke motivering geeft. Het zou sterker zijn als jullie ook benoemen waar deze motivering wordt vastgelegd (bijvoorbeeld in het proces-verbaal van de examencommissie).
+De passages laten zien dat er een controle is op de volledigheid van het PTA, maar niet expliciet op de inhoudelijke juistheid (bijvoorbeeld: wordt alle verplichte stof getoetst?). Voeg dit toe aan de wijze van meten.
+Vervolgstappen:
+
+Vul de ‘wijze van meten’ aan met concrete criteria voor de controle op volledigheid en inhoudelijke juistheid. Gebruik bijvoorbeeld een checklist gebaseerd op de wettelijke eisen.
+Voeg in de ‘concrete acties’ een opsomming toe van de wettelijke onderdelen die in het PTA moeten staan (vorm, weging, domeinen, beschrijving, status, planning).
+Benoem waar de schriftelijke motivering van de algemeen directeur bij afwijking van het voorstel van de examencommissie wordt vastgelegd.
+Controleer of de evaluatie van het PTA en examenreglement ook de inhoudelijke juistheid omvat.
+**
+
+Onderbouwing:
+
+• Examenreglement.pdf, p.11
+
+• Examenreglement.pdf, p.12
+
+• Examenreglement.pdf, p.8
+
+• Examenreglement.pdf, p.1
+
+• Examenreglement.pdf, p.7
+
+• Examenreglement.pdf, p.26
+
+🧑
+Duidelijk! Welke onderdelen moet er allemaal in het PTA staan?
+
+🤖
+Volgens het examenreglement (en de wettelijke eisen, zoals beschreven in de passages) moet het PTA minimaal de volgende onderdelen bevatten:
+
+Welke examenstof van het examenprogramma in het schoolexamen wordt getoetst: Dit geeft aan welke leerstof relevant is voor het schoolexamen.
+Welke door het bevoegd gezag vast te stellen examenstof in het schoolexamen wordt getoetst: Dit betreft de stof die de school zelf toevoegt aan het curriculum en dus ook toetst.
+De inhoud van de toetsen die onderdeel uitmaken van het schoolexamen: Een concrete beschrijving van wat er in elke toets wordt getoetst. Niet alleen “hoofdstuk 3”, maar bijvoorbeeld “paragraaf 3.1 t/m 3.5: fotosynthese en ademhaling”.
+De wijze waarop en tijdvakken waarbinnen de toetsen en herkansingen van het schoolexamen plaatsvinden: Dit omvat de toetsvorm (schriftelijk, praktijk, etc.), de planning en de mogelijkheden voor herkansing.
+De regels voor de wijze waarop het cijfer voor het schoolexamen voor een kandidaat tot stand komt: Hoe de verschillende toetsen worden gewogen en hoe het eindcijfer wordt bepaald.
+De status van de stof: Duidelijk aangeven welke toetsen bijdragen aan de afsluiting van verplichte examenstof (SE-stof), verplichte CE-stof (centraal examen) en eigen keuze stof.
+Het is belangrijk dat deze onderdelen expliciet in het PTA worden benoemd om te voldoen aan de wettelijke eisen en om leerlingen en ouders een helder overzicht te geven van de examinering.
+
+Bron: Examenreglement.pdf, p.12
+
+🧑
+Duidelijk! Wij hebben deze opsomming: Het PTA bestaat in ieder geval uit de volgende onderdelen: a. welke examenstof van het examenprogramma in het schoolexamen wordt getoetst; b. welke door het bevoegd gezag vast te stellen examenstof in het schoolexamen wordt getoetst; c. de inhoud van de toetsen die onderdeel uitmaken van het schoolexamen; d. de wijze waarop en tijdvakken waarbinnen de toetsen en herkansingen van het schoolexamen plaatsvinden; e. de regels voor de wijze waarop het cijfer voor het schoolexamen voor een kandidaat tot stand komt. f. De algemeen directeur zorgt ervoor dat ten aanzien van de toetsen die deel uitmaken van het schoolexamen, in het PTA duidelijk en herleidbaar wordt aangegeven welke toetsen bijdragen aan de afsluiting van: g. De verplichte examenstof van het examenprogramma die behoort bij het schoolexamen; h. De examenstof van het examenprogramma die behoort tot de verplichte examenstof van het centraal eindexamen, maar die ook in het schoolexamen zal worden getoetst; en i. De examenstof die op voordracht van de examinatoren is vastgesteld door de algemeen directeur. Kan je controleren of we hiermee voldoen aan die punten?
+
+🤖
+Ja, jullie opsomming voldoet aan de vereisten. Jullie hebben alle noodzakelijke onderdelen opgenomen die in het PTA moeten staan, zoals beschreven in het examenreglement en de wettelijke eisen.
+
+Laten we de punten even afstemmen:
+
+Welke examenstof van het examenprogramma in het schoolexamen wordt getoetst: Gedekt door punt a.
+Welke door het bevoegd gezag vast te stellen examenstof in het schoolexamen wordt getoetst: Gedekt door punt b.
+De inhoud van de toetsen die onderdeel uitmaken van het schoolexamen: Gedekt door punt c.
+De wijze waarop en tijdvakken waarbinnen de toetsen en herkansingen van het schoolexamen plaatsvinden: Gedekt door punt d.
+De regels voor de wijze waarop het cijfer voor het schoolexamen voor een kandidaat tot stand komt: Gedekt door punt e.
+De status van de stof (SE/CE/eigen keuze): Duidelijk gedekt door punten f, g, h en i. Jullie specificeren expliciet de verplichte examenstof, de CE-stof en de stof die op voordracht van de examinatoren is vastgesteld.
+Jullie opsomming is compleet en gedetailleerd. Dit geeft aan dat jullie een goed doordacht PTA hebben.
+
+Bron: Examenreglement.pdf, p.12
