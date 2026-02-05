@@ -38,7 +38,9 @@
       "Bash(sort:*)",
       "Bash(git ls-tree:*)",
       "Bash(git reflog:*)",
-      "Bash(git gc:*)"
+      "Bash(git gc:*)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:github.com)"
     ]
   }
 }
