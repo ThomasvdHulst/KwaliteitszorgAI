@@ -3,6 +3,12 @@
 from pydantic import BaseModel, Field
 
 
+class ErrorResponse(BaseModel):
+    """Standaard error response model."""
+
+    detail: str = Field(..., description="Foutmelding")
+
+
 class ChatResponse(BaseModel):
     """Response van de chat endpoint."""
 

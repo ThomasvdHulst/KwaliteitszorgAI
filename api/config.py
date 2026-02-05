@@ -1,11 +1,13 @@
 """API configuratie - Volledig standalone."""
 
+import logging
 import os
 from functools import lru_cache
 from pathlib import Path
 
 from pydantic_settings import BaseSettings
 
+logger = logging.getLogger(__name__)
 
 # Bepaal het pad naar de api/ directory
 API_DIR = Path(__file__).resolve().parent
@@ -21,8 +23,8 @@ class APISettings(BaseSettings):
     api_version: str = "1.0.0"
     api_description: str = "REST API voor OnSpectAI - Laravel integratie"
 
-    # Security
-    api_key: str = os.getenv("ONSPECTAI_API_KEY", "development-key")
+    # Security - GEEN default in productie!
+    api_key: str = os.getenv("ONSPECTAI_API_KEY", "")
 
     # CORS - comma-separated list of origins
     cors_origins: str = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:8080")
@@ -57,7 +59,16 @@ class APISettings(BaseSettings):
 @lru_cache
 def get_settings() -> APISettings:
     """Get cached settings instance."""
-    return APISettings()
+    settings = APISettings()
+
+    # Waarschuw als geen API key geconfigureerd
+    if not settings.api_key:
+        logger.warning(
+            "ONSPECTAI_API_KEY niet geconfigureerd! "
+            "De API is onbeveiligd zonder API key."
+        )
+
+    return settings
 
 
 def check_ollama_connection() -> tuple[bool, str]:

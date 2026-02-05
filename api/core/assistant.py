@@ -5,12 +5,12 @@ Elke request is stateless (geen chat history).
 """
 
 import logging
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import ollama
 
 from api.config import get_settings
-from .database import load_database, load_deugdelijkheidseis
+from .database import EisNotFoundError, load_database, load_deugdelijkheidseis
 from .prompts import SYSTEM_PROMPT, get_task_instruction
 from .school_invulling import SchoolInvulling
 
@@ -26,8 +26,16 @@ class DeugdelijkheidseisAssistent:
         self.database_path = database_path or settings.database_path
         self.database = load_database(self.database_path)
 
-    def get_deugdelijkheidseis(self, eis_id: str) -> Dict:
-        """Haal deugdelijkheidseis op uit database."""
+    def get_deugdelijkheidseis(self, eis_id: str) -> Optional[Dict]:
+        """
+        Haal deugdelijkheidseis op uit database.
+
+        Args:
+            eis_id: ID van de eis (bijv. 'VS 1.5')
+
+        Returns:
+            Dictionary met eis data, of None als niet gevonden
+        """
         return load_deugdelijkheidseis(self.database, eis_id)
 
     def chat(
@@ -69,8 +77,21 @@ class DeugdelijkheidseisAssistent:
         school_invulling: SchoolInvulling,
         vraag_type: str,
     ) -> str:
-        """Bouw de system message met alle context."""
-        eis = load_deugdelijkheidseis(self.database, eis_id)
+        """
+        Bouw de system message met alle context.
+
+        Args:
+            eis_id: ID van de deugdelijkheidseis
+            school_invulling: De invulling van de school
+            vraag_type: Type vraag (feedback/uitleg/suggestie/algemeen)
+
+        Returns:
+            De volledige system prompt met context
+
+        Raises:
+            EisNotFoundError: Als de eis niet in de database staat
+        """
+        eis = load_deugdelijkheidseis(self.database, eis_id, raise_on_not_found=True)
         task_instruction = get_task_instruction(vraag_type)
 
         return f"""{SYSTEM_PROMPT}

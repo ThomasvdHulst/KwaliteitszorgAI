@@ -16,7 +16,12 @@ st.markdown("*Test de API zoals Laravel (of elke andere client) dat zou doen*")
 with st.sidebar:
     st.header("API Configuratie")
     api_url = st.text_input("API URL", value="http://localhost:8000")
-    api_key = st.text_input("API Key", value="development-key", type="password")
+    api_key = st.text_input(
+        "API Key",
+        value="",
+        type="password",
+        help="Leeg laten voor development mode (als ONSPECTAI_API_KEY niet gezet is)"
+    )
 
     st.divider()
 
@@ -38,10 +43,9 @@ with st.sidebar:
             st.error(f"❌ Fout: {e}")
 
 # Headers voor API calls
-headers = {
-    "X-API-Key": api_key,
-    "Content-Type": "application/json",
-}
+headers = {"Content-Type": "application/json"}
+if api_key:
+    headers["X-API-Key"] = api_key
 
 # Tabs voor verschillende functionaliteiten
 tab_chat, tab_eisen, tab_raw = st.tabs(["💬 Chat", "📋 Eisen", "🔧 Raw Request"])
@@ -56,15 +60,18 @@ with tab_chat:
     @st.cache_data(ttl=60)
     def fetch_eisen(url, key):
         try:
+            req_headers = {}
+            if key:
+                req_headers["X-API-Key"] = key
             resp = requests.get(
                 f"{url}/api/v1/eisen",
-                headers={"X-API-Key": key},
+                headers=req_headers,
                 timeout=10,
             )
             if resp.status_code == 200:
                 return resp.json()["eisen"]
             return []
-        except:
+        except Exception:
             return []
 
     eisen = fetch_eisen(api_url, api_key)
