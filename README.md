@@ -82,22 +82,26 @@ Open vervolgens http://localhost:8501 in je browser.
 ## Projectstructuur
 
 ```
-KwaliteitszorgAIv2/
+OnSpectAIv2/
 ├── config/
-│   └── settings.py          # Centrale configuratie
-├── src/Kwaliteitszorg/
-│   ├── models/              # Dataclasses
-│   ├── core/                # Context en conversatie management
-│   ├── assistant/           # AI assistent en prompts
-│   └── utils/               # Database utilities
+│   └── settings.py              # Centrale configuratie
+├── src/kwaliteitszorg/
+│   ├── models/                  # Dataclasses (SchoolInvulling)
+│   ├── assistant/               # AI assistent, prompts en suggesties
+│   ├── rag/                     # RAG pipeline (chunker, embedder, vector store, retriever)
+│   └── utils/                   # Database loading, PDF processing
 ├── data/
-│   └── deugdelijkheidseisen_db.json
+│   ├── deugdelijkheidseisen_db.json
+│   └── rag_vectorstore/         # Opgeslagen embeddings
 ├── app/
-│   └── streamlit_app.py     # Web interface
+│   ├── streamlit_app.py         # Hoofd web interface
+│   ├── rag_ui.py                # Document databank UI
+│   └── suggestie_ui.py          # Suggestie feature UI
+├── api/                         # Standalone REST API (FastAPI)
 ├── tests/
-│   └── test_scenarios.py    # Test scenarios
+│   └── test_scenarios.py        # Test scenarios
 └── scripts/
-    └── run_demo.sh          # Demo launcher
+    └── run_demo.sh              # Demo launcher
 ```
 
 ## Configuratie

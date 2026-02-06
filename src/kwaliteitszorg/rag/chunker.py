@@ -487,7 +487,7 @@ class DocumentChunker:
                     char_start = char_position
                 char_end = char_start + len(clean_text)
                 char_position = char_start + 100
-            except:
+            except Exception:
                 char_start = char_position
                 char_end = char_start + len(text)
 
@@ -558,4 +558,5 @@ def chunk_pdf_file(file_path: str, chunker: DocumentChunker = None) -> ChunkingR
         text=result.text,
         document_name=path.name,
         document_path=str(path),
+        page_boundaries=result.page_boundaries,
     )

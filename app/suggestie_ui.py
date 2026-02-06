@@ -5,6 +5,7 @@ Dit bestand kan worden verwijderd samen met src/kwaliteitszorg/assistant/suggest
 om de feature volledig te verwijderen.
 """
 
+import html
 import streamlit as st
 from typing import Dict
 
@@ -133,21 +134,25 @@ def render_veld_suggestie(veld: str, suggestie: VeldSuggestie) -> str:
         """, unsafe_allow_html=True)
         return None
 
-    # Render de suggestie
+    # Render de suggestie (HTML-escaped tegen XSS via AI output)
+    safe_toelichting = html.escape(suggestie.toelichting) if suggestie.toelichting else ""
+    safe_huidige = html.escape(suggestie.huidige_tekst) if suggestie.huidige_tekst else "[leeg]"
+    safe_nieuwe = html.escape(suggestie.nieuwe_tekst) if suggestie.nieuwe_tekst else "[leeg]"
+
     st.markdown(f"""
     <div class="suggestie-container">
         <div class="suggestie-header">
             <h4>{label}</h4>
         </div>
-        {f'<div class="suggestie-toelichting">{suggestie.toelichting}</div>' if suggestie.toelichting else ''}
+        {f'<div class="suggestie-toelichting">{safe_toelichting}</div>' if safe_toelichting else ''}
         <div class="diff-container">
             <div>
                 <div class="diff-label">HUIDIGE TEKST</div>
-                <div class="diff-box diff-old">{suggestie.huidige_tekst or '[leeg]'}</div>
+                <div class="diff-box diff-old">{safe_huidige}</div>
             </div>
             <div>
                 <div class="diff-label">SUGGESTIE</div>
-                <div class="diff-box diff-new">{suggestie.nieuwe_tekst or '[leeg]'}</div>
+                <div class="diff-box diff-new">{safe_nieuwe}</div>
             </div>
         </div>
     </div>

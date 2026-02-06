@@ -1,11 +1,13 @@
 """
 Kwaliteitszorg AI - Streamlit Web Interface
 
-Chat-interface voor kwaliteitszorg onderwijs.
+Multi-page app met home-overzicht en detail-pagina per deugdelijkheidseis.
 """
 
+import json
 import sys
 from pathlib import Path
+from collections import defaultdict
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
@@ -19,15 +21,12 @@ from src.kwaliteitszorg.utils.pdf_processor import extract_text_from_pdf
 
 # ============================================================================
 # EXPERIMENTEEL: Suggestie feature import
-# Verwijder dit blok + de aanroep in main() om de feature uit te schakelen
 # ============================================================================
 try:
-    # Absolute import path voor robuustheid
     from app.suggestie_ui import render_suggesties_tab
     SUGGESTIES_ENABLED = True
 except ImportError:
     try:
-        # Fallback voor directe uitvoering vanuit app/ directory
         from suggestie_ui import render_suggesties_tab
         SUGGESTIES_ENABLED = True
     except ImportError:
@@ -54,6 +53,28 @@ except ImportError:
         RAG_ENABLED = True
     except ImportError:
         RAG_ENABLED = False
+# ============================================================================
+
+# ============================================================================
+# Invulling storage import
+# ============================================================================
+try:
+    from app.invulling_storage import (
+        load_invulling,
+        save_invulling,
+        get_invulling_status,
+    )
+    STORAGE_ENABLED = True
+except ImportError:
+    try:
+        from invulling_storage import (
+            load_invulling,
+            save_invulling,
+            get_invulling_status,
+        )
+        STORAGE_ENABLED = True
+    except ImportError:
+        STORAGE_ENABLED = False
 # ============================================================================
 
 # Thema kleuren
@@ -177,103 +198,39 @@ def inject_css():
             border-radius: 8px 8px 0 0;
         }}
 
-        /* Sidebar selectbox dropdown fix - agressieve override */
-        /* Fix voor dropdown menu dat te ver naar links staat */
-        [data-baseweb="popover"] [data-baseweb="menu"],
-        [data-baseweb="select"] [data-baseweb="menu"],
-        [data-baseweb="popover"] ul[role="listbox"],
-        div[data-baseweb="popover"] > div {{
-            min-width: 280px !important;
-            width: max-content !important;
-            max-width: 90vw !important;
-        }}
-
-        /* Fix menu item padding en uitlijning */
-        [data-baseweb="menu"] li,
-        ul[role="listbox"] li,
-        [role="option"] {{
-            padding: 10px 16px !important;
-            text-align: left !important;
-            white-space: normal !important;
-            word-break: break-word !important;
-        }}
-
-        /* Zorg dat tekst in dropdown zichtbaar is */
-        [data-baseweb="menu"] li > div,
-        [role="option"] > div {{
-            overflow: visible !important;
-            text-overflow: unset !important;
-            white-space: normal !important;
-        }}
-
-        /* Sidebar specifiek - voorkom dat dropdown buiten scherm valt */
-        [data-testid="stSidebar"] [data-baseweb="popover"] {{
-            left: 10px !important;
-            right: auto !important;
-            transform: none !important;
-        }}
-
-        /* Floating AI Chat Button */
-        .ai-chat-button {{
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, {COLORS["primary"]} 0%, {COLORS["primary_dark"]} 100%);
-            box-shadow: 0 4px 16px rgba(69, 153, 213, 0.4);
-            cursor: pointer;
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            border: none;
-        }}
-        .ai-chat-button:hover {{
-            transform: scale(1.1);
-            box-shadow: 0 6px 24px rgba(69, 153, 213, 0.5);
-        }}
-        .ai-chat-button img {{
-            width: 32px;
-            height: 32px;
-        }}
-
-        /* Chat Panel */
-        .chat-panel {{
-            position: fixed;
-            bottom: 100px;
-            right: 24px;
-            width: 420px;
-            max-height: 70vh;
+        /* ============================================ */
+        /* Home page: eis kaartjes                      */
+        /* ============================================ */
+        .eis-card {{
             background: {COLORS["bg_white"]};
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-            z-index: 9998;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }}
-        .chat-panel-header {{
-            background: linear-gradient(135deg, {COLORS["primary"]} 0%, {COLORS["primary_dark"]} 100%);
-            color: white;
+            border: 1px solid {COLORS["border"]};
+            border-radius: 12px;
             padding: 1rem 1.25rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s;
+        }}
+        .eis-card:hover {{
+            border-color: {COLORS["primary"]};
+            box-shadow: 0 2px 12px rgba(69, 153, 213, 0.15);
+        }}
+        .eis-card-id {{
+            font-weight: 700;
+            color: {COLORS["primary"]};
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }}
+        .eis-card-title {{
             font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            color: {COLORS["text_dark"]};
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
         }}
-        .chat-panel-body {{
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-            max-height: calc(70vh - 120px);
+        .eis-card-status {{
+            font-size: 0.8rem;
+            color: {COLORS["text_gray"]};
         }}
-        .chat-panel-footer {{
-            padding: 0.75rem;
-            border-top: 1px solid {COLORS["border"]};
-            background: {COLORS["bg_light"]};
+        .eis-card-status.opgeslagen {{
+            color: #16A34A;
         }}
     </style>
     """, unsafe_allow_html=True)
@@ -282,6 +239,16 @@ def inject_css():
 @st.cache_data
 def get_database() -> dict:
     return load_database(str(settings.DATABASE_PATH))
+
+
+@st.cache_data
+def get_standaard_naslagwerk() -> dict:
+    """Laad standaard-specifiek naslagwerk (blog, kenniskaart, etc.)."""
+    path = settings.DATA_DIR / "standaarden_naslagwerk.json"
+    if not path.exists():
+        return {}
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 
 def get_assistent() -> DeugdelijkheidseisAssistent:
@@ -297,6 +264,13 @@ def init_session_state():
         st.session_state.messages = []
     if "current_eis" not in st.session_state:
         st.session_state.current_eis = None
+    if "current_page" not in st.session_state:
+        st.session_state.current_page = "home"
+    # Standaard chat state
+    if "standaard_messages" not in st.session_state:
+        st.session_state.standaard_messages = []
+    if "standaard_chat_current" not in st.session_state:
+        st.session_state.standaard_chat_current = None
     # Document upload state
     if "document_text" not in st.session_state:
         st.session_state.document_text = None
@@ -322,46 +296,63 @@ def reset_chat():
     # Reset input velden
     for key in ["input_ambitie", "input_resultaat", "input_acties", "input_meten"]:
         st.session_state[key] = ""
-    # Reset document (niet automatisch - gebruiker moet expliciet verwijderen)
-    # st.session_state.document_text = None
-    # st.session_state.document_filename = None
 
+
+# ============================================================================
+# Navigatie
+# ============================================================================
+
+def navigate_to_eis(eis_id: str):
+    """Navigeer naar de detail-pagina voor een eis."""
+    st.session_state.current_page = "eis_detail"
+    st.session_state.current_eis = eis_id
+
+    # Reset chat eerst (dit maakt ook input velden leeg)
+    reset_chat()
+
+    # Laad opgeslagen invulling NA reset_chat, zodat waarden niet overschreven worden
+    if STORAGE_ENABLED:
+        invulling = load_invulling(eis_id)
+        if invulling:
+            st.session_state.input_ambitie = invulling.get("ambitie", "")
+            st.session_state.input_resultaat = invulling.get("beoogd_resultaat", "")
+            st.session_state.input_acties = invulling.get("concrete_acties", "")
+            st.session_state.input_meten = invulling.get("wijze_van_meten", "")
+
+    # Increment widget version om widgets te forceren naar nieuwe waarden
+    st.session_state.widget_version = st.session_state.get("widget_version", 0) + 1
+
+    st.rerun()
+
+
+def navigate_to_home():
+    """Navigeer terug naar het overzicht."""
+    st.session_state.current_page = "home"
+    reset_chat()
+    st.rerun()
+
+
+# ============================================================================
+# Chat rendering (ongewijzigd)
+# ============================================================================
 
 def render_chat_message(role: str, content: str, sources: list = None):
     """Render een chat bericht met optionele bronvermelding."""
-    # Gebruik Streamlit's native chat_message voor correcte markdown rendering
-    avatar = "🧑" if role == "user" else "🤖"
+    avatar = "\U0001f9d1" if role == "user" else "\U0001f916"
     with st.chat_message(role, avatar=avatar):
         st.markdown(content)
-        # Toon bronvermelding als die er is
         if sources and role == "assistant":
             st.markdown("---")
             st.markdown("**Onderbouwing:**")
             for source in sources:
-                st.caption(f"• {source}")
+                st.caption(f"\u2022 {source}")
 
 
 def extract_onderbouwing_from_response(response: str) -> tuple:
-    """
-    Extraheer de ONDERBOUWING sectie uit het AI-antwoord.
-
-    De AI is geïnstrueerd om zijn antwoord te eindigen met:
-    ONDERBOUWING:
-    - document1.pdf
-    - document2.pdf
-
-    Args:
-        response: Het AI-gegenereerde antwoord
-
-    Returns:
-        Tuple van (cleaned_response, used_sources)
-        - cleaned_response: Antwoord zonder de ONDERBOUWING sectie
-        - used_sources: Lijst van documentnamen
-    """
+    """Extraheer de ONDERBOUWING sectie uit het AI-antwoord."""
     if not response:
         return response, []
 
-    # Zoek naar de ONDERBOUWING sectie (case-insensitive)
     import re
     pattern = r'\n*ONDERBOUWING:\s*(.*)$'
     match = re.search(pattern, response, re.IGNORECASE | re.DOTALL)
@@ -369,27 +360,22 @@ def extract_onderbouwing_from_response(response: str) -> tuple:
     if not match:
         return response, []
 
-    # Haal het deel voor ONDERBOUWING
     onderbouwing_start = match.start()
     cleaned_response = response[:onderbouwing_start].strip()
 
-    # Parse de bronnen uit de ONDERBOUWING sectie
     onderbouwing_text = match.group(1).strip()
 
-    # Check voor "Geen documenten gebruikt" of vergelijkbaar
     if "geen" in onderbouwing_text.lower():
         return cleaned_response, []
 
-    # Zoek naar document namen (elke regel die begint met - of *)
     sources = []
     for line in onderbouwing_text.split('\n'):
         line = line.strip()
-        if line.startswith('-') or line.startswith('*') or line.startswith('•'):
-            source = line.lstrip('-*• ').strip()
+        if line.startswith('-') or line.startswith('*') or line.startswith('\u2022'):
+            source = line.lstrip('-*\u2022 ').strip()
             if source:
                 sources.append(source)
         elif line and not line.startswith('ONDERBOUWING'):
-            # Soms zonder bullets
             sources.append(line)
 
     return cleaned_response, sources
@@ -404,16 +390,9 @@ def _process_chat_message(
     document_filename: str = None,
     rag_context: str = None,
 ):
-    """
-    Verwerk een chat bericht en genereer een antwoord.
-
-    Dit is een interne functie die zowel door de chat knop als door
-    auto-triggers (bijv. vanuit suggesties) aangeroepen kan worden.
-    """
-    # Voeg user bericht toe aan weergave
+    """Verwerk een chat bericht en genereer een antwoord."""
     st.session_state.messages.append({"role": "user", "content": vraag})
 
-    # Placeholder voor streaming response
     with st.spinner(""):
         response_placeholder = st.empty()
         response_buffer = ""
@@ -421,10 +400,8 @@ def _process_chat_message(
         def handle_chunk(chunk: str):
             nonlocal response_buffer
             response_buffer += chunk
-            # Gebruik markdown voor streaming (zonder complexe HTML)
             response_placeholder.markdown(response_buffer)
 
-        # Genereer antwoord met error handling
         try:
             assistent = get_assistent()
             antwoord = assistent.chat(
@@ -439,23 +416,19 @@ def _process_chat_message(
             )
         except RuntimeError as e:
             st.error(str(e))
-            # Verwijder het user bericht weer uit de lijst
             st.session_state.messages.pop()
             return
 
-    # Extraheer ONDERBOUWING sectie uit het antwoord (als RAG actief was)
     used_sources = []
     display_content = antwoord
     if rag_context:
         display_content, used_sources = extract_onderbouwing_from_response(antwoord)
 
-    # Voeg assistant bericht toe (met bronnen indien beschikbaar)
     message_data = {"role": "assistant", "content": display_content}
     if used_sources:
         message_data["sources"] = used_sources
     st.session_state.messages.append(message_data)
 
-    # Rerun om UI te updaten
     st.rerun()
 
 
@@ -469,25 +442,20 @@ def render_chat_tab(
     """Render de chat tab."""
     st.markdown("### Chat met Kwaliteitszorg AI")
 
-    # Check voor auto-chat trigger (van suggesties "Wat kan ik nu doen?")
     auto_trigger = st.session_state.get("auto_chat_trigger")
     if st.session_state.get("switch_to_chat"):
-        st.info("💡 Vraag wordt automatisch verstuurd...")
-        # Clear de flags nu we ze gaan verwerken
+        st.info("\U0001f4a1 Vraag wordt automatisch verstuurd...")
         st.session_state.pop("auto_chat_trigger", None)
         st.session_state.pop("switch_to_chat", None)
 
-    # Toon context indicator
     if rag_context:
         st.info("Documentdatabank actief - relevante passages worden meegestuurd")
     elif document_text:
         st.info(f"Document gekoppeld: **{document_filename}**")
 
-    # Toon bestaande berichten
     for msg in st.session_state.messages:
         render_chat_message(msg["role"], msg["content"], msg.get("sources"))
 
-    # Verwerk auto-trigger als aanwezig
     if auto_trigger:
         _process_chat_message(
             vraag=auto_trigger["vraag"],
@@ -498,9 +466,8 @@ def render_chat_tab(
             document_filename=document_filename,
             rag_context=rag_context,
         )
-        return  # Stop hier, rerun gebeurt in _process_chat_message
+        return
 
-    # Chat input
     col_input, col_type = st.columns([3, 1])
 
     with col_type:
@@ -534,7 +501,6 @@ def render_chat_tab(
             label_visibility="collapsed",
         )
 
-    # Verstuur knop
     if st.button("Verstuur", type="primary", use_container_width=True):
         if not vraag.strip():
             st.warning("Typ eerst een vraag.")
@@ -550,30 +516,177 @@ def render_chat_tab(
             )
 
 
-def main():
-    st.set_page_config(
-        page_title="Kwaliteitszorg AI",
-        page_icon="🎓",
-        layout="wide",
-        initial_sidebar_state="collapsed",
-    )
+# ============================================================================
+# Standaard-niveau chat
+# ============================================================================
 
-    inject_css()
-    init_session_state()
+def _get_standaard_invullingen(eis_lijst: list) -> dict:
+    """Laad opgeslagen invullingen voor alle eisen in een standaard."""
+    invullingen = {}
+    for eis_id, _eis_data in eis_lijst:
+        if STORAGE_ENABLED:
+            data = load_invulling(eis_id)
+            if data:
+                invullingen[eis_id] = SchoolInvulling(
+                    ambitie=data.get("ambitie", ""),
+                    beoogd_resultaat=data.get("beoogd_resultaat", ""),
+                    concrete_acties=data.get("concrete_acties", ""),
+                    wijze_van_meten=data.get("wijze_van_meten", ""),
+                )
+            else:
+                invullingen[eis_id] = SchoolInvulling()
+        else:
+            invullingen[eis_id] = SchoolInvulling()
+    return invullingen
 
-    # Check Ollama verbinding bij eerste keer laden
-    if "ollama_checked" not in st.session_state:
-        from config.settings import check_ollama_connection
-        success, message = check_ollama_connection()
-        st.session_state.ollama_checked = True
-        st.session_state.ollama_ok = success
-        st.session_state.ollama_message = message
 
-    if not st.session_state.ollama_ok:
-        st.error(f"**Ollama niet beschikbaar:** {st.session_state.ollama_message}")
-        st.info("Start Ollama en herlaad deze pagina.")
-        st.stop()
+def _process_standaard_chat_message(
+    vraag: str,
+    vraag_type: str,
+    standaard_naam: str,
+    eisen_met_invullingen: dict,
+    naslagwerk: str = "",
+    standaard_omschrijving: str = "",
+    rag_context: str = None,
+):
+    """Verwerk een standaard-niveau chat bericht."""
+    st.session_state.standaard_messages.append({"role": "user", "content": vraag})
 
+    with st.spinner(""):
+        response_placeholder = st.empty()
+        response_buffer = ""
+
+        def handle_chunk(chunk: str):
+            nonlocal response_buffer
+            response_buffer += chunk
+            response_placeholder.markdown(response_buffer)
+
+        try:
+            assistent = get_assistent()
+            antwoord = assistent.chat_standaard(
+                standaard_naam=standaard_naam,
+                eisen_met_invullingen=eisen_met_invullingen,
+                vraag=vraag,
+                vraag_type=vraag_type,
+                stream_handler=handle_chunk,
+                naslagwerk=naslagwerk,
+                standaard_omschrijving=standaard_omschrijving,
+                rag_context=rag_context,
+            )
+        except RuntimeError as e:
+            st.error(str(e))
+            st.session_state.standaard_messages.pop()
+            return
+
+    used_sources = []
+    display_content = antwoord
+    if rag_context:
+        display_content, used_sources = extract_onderbouwing_from_response(antwoord)
+
+    message_data = {"role": "assistant", "content": display_content}
+    if used_sources:
+        message_data["sources"] = used_sources
+    st.session_state.standaard_messages.append(message_data)
+
+    st.rerun()
+
+
+def render_standaard_chat_tab(
+    standaard_naam: str,
+    eis_lijst: list,
+    naslagwerk_data: dict,
+    rag_context: str = None,
+):
+    """Render de chat tab voor standaard-niveau gesprekken."""
+    naslagwerk = naslagwerk_data.get("naslagwerk", "")
+    omschrijving = naslagwerk_data.get("omschrijving", "")
+
+    # Laad invullingen voor deze standaard
+    invullingen = _get_standaard_invullingen(eis_lijst)
+
+    # Toon overzicht
+    ingevuld = sum(1 for inv in invullingen.values() if not inv.is_leeg())
+    totaal = len(eis_lijst)
+    st.caption(f"Standaard: **{standaard_naam}** \u2014 {ingevuld}/{totaal} eisen ingevuld")
+
+    if naslagwerk:
+        st.caption("Naslagwerk beschikbaar als context")
+    else:
+        st.caption("Geen standaard-specifiek naslagwerk beschikbaar")
+
+    if rag_context:
+        st.info("Documentdatabank actief")
+
+    # Toon berichten
+    for msg in st.session_state.standaard_messages:
+        render_chat_message(msg["role"], msg["content"], msg.get("sources"))
+
+    # Input
+    col_input, col_type = st.columns([3, 1])
+
+    with col_type:
+        vraag_type = st.selectbox(
+            "Type",
+            ["feedback", "uitleg", "suggestie", "algemeen"],
+            format_func=lambda x: {
+                "feedback": "Beoordeling",
+                "uitleg": "Uitleg",
+                "suggestie": "Suggestie",
+                "algemeen": "Algemeen",
+            }.get(x, x),
+            label_visibility="collapsed",
+            key="standaard_chat_type",
+        )
+
+    with col_input:
+        if not st.session_state.standaard_messages:
+            placeholder = {
+                "feedback": "Beoordeel onze invullingen voor deze standaard",
+                "uitleg": "Leg deze standaard uit en hoe de eisen samenhangen",
+                "suggestie": "Geef suggesties voor verbetering van deze standaard",
+                "algemeen": "Stel je vraag over deze standaard...",
+            }.get(vraag_type, "Stel je vraag...")
+        else:
+            placeholder = "Stel een vervolgvraag..."
+
+        vraag = st.text_input(
+            "Vraag",
+            placeholder=placeholder,
+            key="standaard_chat_input",
+            label_visibility="collapsed",
+        )
+
+    if st.button("Verstuur", type="primary", use_container_width=True, key="standaard_chat_send"):
+        if not vraag.strip():
+            st.warning("Typ eerst een vraag.")
+        else:
+            _process_standaard_chat_message(
+                vraag=vraag,
+                vraag_type=vraag_type,
+                standaard_naam=standaard_naam,
+                eisen_met_invullingen=invullingen,
+                naslagwerk=naslagwerk,
+                standaard_omschrijving=omschrijving,
+                rag_context=rag_context,
+            )
+
+
+# ============================================================================
+# Home page
+# ============================================================================
+
+def _group_eisen_by_standaard(eisen: dict) -> dict:
+    """Groepeer eisen op standaard. Return dict van standaard -> [(eis_id, eis_data)]."""
+    grouped = defaultdict(list)
+    for eis_id in sorted(eisen.keys()):
+        eis = eisen[eis_id]
+        standaard = eis.get("standaard", "Overig")
+        grouped[standaard].append((eis_id, eis))
+    return dict(grouped)
+
+
+def render_home_page():
+    """Render de home-pagina met overzicht van alle eisen."""
     database = get_database()
     eisen = database.get("deugdelijkheidseisen", {})
 
@@ -581,35 +694,157 @@ def main():
         st.error("Geen deugdelijkheidseisen gevonden.")
         return
 
-    # Sidebar
-    with st.sidebar:
-        st.markdown("### Instellingen")
-        eis_ids = sorted(eisen.keys())
+    # Header
+    st.markdown(f"""
+    <div class="main-header">
+        <h1>Kwaliteitszorg AI</h1>
+        <div class="subtitle">Overzicht deugdelijkheidseisen</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-        def format_eis_option(eis_id: str) -> str:
-            """Format eis voor dropdown - kort titel in als te lang."""
-            titel = eisen[eis_id].get('titel', '')
-            # Kort in tot max 30 karakters voor leesbaarheid in dropdown
-            if len(titel) > 30:
-                titel = titel[:27] + "..."
-            return f"{eis_id} - {titel}"
+    # Documentdatabank in expander
+    if RAG_ENABLED:
+        with st.expander("Documentdatabank beheren", expanded=False):
+            render_document_databank()
 
-        selected_id = st.selectbox(
-            "Deugdelijkheidseis",
-            eis_ids,
-            format_func=format_eis_option,
+    # Eisen per standaard
+    grouped = _group_eisen_by_standaard(eisen)
+
+    for standaard, eis_lijst in grouped.items():
+        st.markdown(f"### {standaard}")
+
+        # 3 kolommen
+        cols = st.columns(3)
+        for idx, (eis_id, eis) in enumerate(eis_lijst):
+            col = cols[idx % 3]
+
+            with col:
+                # Status bepalen
+                if STORAGE_ENABLED:
+                    status = get_invulling_status(eis_id)
+                else:
+                    status = "niet_opgeslagen"
+
+                if status == "opgeslagen":
+                    status_html = '<div class="eis-card-status opgeslagen">\u2705 Opgeslagen</div>'
+                else:
+                    status_html = '<div class="eis-card-status">\u2014 Niet ingevuld</div>'
+
+                st.markdown(f"""
+                <div class="eis-card">
+                    <div class="eis-card-id">{eis_id}</div>
+                    <div class="eis-card-title">{eis.get("titel", "")}</div>
+                    {status_html}
+                </div>
+                """, unsafe_allow_html=True)
+
+                if st.button("Openen", key=f"open_{eis_id}", use_container_width=True):
+                    navigate_to_eis(eis_id)
+
+    # ========================================================================
+    # Floating AI Chat voor standaard-niveau
+    # ========================================================================
+    naslagwerk_db = get_standaard_naslagwerk()
+    standaard_options = list(grouped.keys())
+
+    # Popover CSS
+    st.markdown("""
+    <style>
+        div[data-testid="stPopover"] > div:first-child > button {
+            position: fixed !important;
+            bottom: 24px !important;
+            right: 24px !important;
+            width: 64px !important;
+            height: 64px !important;
+            border-radius: 50% !important;
+            background: linear-gradient(135deg, #4599D5 0%, #2C81C0 100%) !important;
+            box-shadow: 0 4px 16px rgba(69, 153, 213, 0.4) !important;
+            z-index: 9999 !important;
+            padding: 0 !important;
+            min-height: unset !important;
+            border: none !important;
+        }
+        div[data-testid="stPopover"] > div:first-child > button:hover {
+            transform: scale(1.1) !important;
+            box-shadow: 0 6px 24px rgba(69, 153, 213, 0.5) !important;
+        }
+        div[data-testid="stPopover"] > div:first-child > button p {
+            font-size: 28px !important;
+            margin: 0 !important;
+            line-height: 1 !important;
+        }
+        div[data-testid="stPopoverBody"] {
+            width: 900px !important;
+            min-width: 900px !important;
+            max-width: 900px !important;
+            min-height: 600px !important;
+            max-height: 85vh !important;
+        }
+        div[data-testid="stPopoverBody"] > div {
+            width: 100% !important;
+            min-height: 580px !important;
+        }
+        [data-baseweb="popover"] > div {
+            width: 700px !important;
+            min-width: 700px !important;
+        }
+        [data-baseweb="popover"] [data-testid="stVerticalBlockBorderWrapper"] {
+            width: 100% !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+    with st.popover("\U0001f916", use_container_width=False):
+        st.markdown("### Standaard AI Assistent")
+
+        selected_standaard = st.selectbox(
+            "Kies een standaard",
+            standaard_options,
+            key="standaard_selector",
         )
 
-        # Reset chat als eis wijzigt
-        if st.session_state.current_eis != selected_id:
-            st.session_state.current_eis = selected_id
-            reset_chat()
+        # Reset chat als standaard wijzigt
+        if st.session_state.standaard_chat_current != selected_standaard:
+            st.session_state.standaard_chat_current = selected_standaard
+            st.session_state.standaard_messages = []
+            get_assistent().reset_standaard_chat()
 
-        if st.button("Nieuwe chat", use_container_width=True):
-            reset_chat()
+        # Naslagwerk voor deze standaard
+        naslagwerk_item = naslagwerk_db.get(selected_standaard, {})
+
+        if st.button("Nieuwe chat", use_container_width=True, key="standaard_new_chat"):
+            st.session_state.standaard_messages = []
+            get_assistent().reset_standaard_chat()
             st.rerun()
 
-    eis = eisen.get(selected_id, {})
+        st.markdown("---")
+
+        render_standaard_chat_tab(
+            standaard_naam=selected_standaard,
+            eis_lijst=grouped[selected_standaard],
+            naslagwerk_data=naslagwerk_item,
+        )
+
+
+# ============================================================================
+# Eis detail page
+# ============================================================================
+
+def render_eis_detail_page():
+    """Render de detail-pagina voor een enkele deugdelijkheidseis."""
+    database = get_database()
+    eisen = database.get("deugdelijkheidseisen", {})
+    selected_id = st.session_state.current_eis
+
+    if not selected_id or selected_id not in eisen:
+        navigate_to_home()
+        return
+
+    eis = eisen[selected_id]
+
+    # Terug-knop
+    if st.button("\u2190 Terug naar overzicht"):
+        navigate_to_home()
 
     # Header
     st.markdown(f"""
@@ -648,10 +883,8 @@ def main():
     if "chat_open" not in st.session_state:
         st.session_state.chat_open = False
 
-    # Widget version wordt verhoogd bij suggestie-acceptatie om widgets te resetten
     v = st.session_state.widget_version
 
-    # Velden onder elkaar met grotere hoogte en karakterlimiet
     ambitie = st.text_area(
         "Ambitie",
         value=st.session_state.input_ambitie,
@@ -692,6 +925,31 @@ def main():
     )
     st.session_state.input_meten = wijze_van_meten
 
+    # Opslaan knop
+    if STORAGE_ENABLED:
+        col_save, col_status = st.columns([1, 2])
+        with col_save:
+            if st.button("Opslaan", type="primary", use_container_width=True):
+                save_invulling(
+                    eis_id=selected_id,
+                    ambitie=ambitie,
+                    beoogd_resultaat=beoogd_resultaat,
+                    concrete_acties=concrete_acties,
+                    wijze_van_meten=wijze_van_meten,
+                )
+                st.session_state.save_success = True
+                st.rerun()
+
+        with col_status:
+            if st.session_state.get("save_success"):
+                st.success("Invulling opgeslagen!")
+                st.session_state.save_success = False
+
+            # Toon laatst opgeslagen timestamp
+            existing = load_invulling(selected_id)
+            if existing and existing.get("laatst_opgeslagen"):
+                st.caption(f"Laatst opgeslagen: {existing['laatst_opgeslagen']}")
+
     # Maak school invulling object
     school_invulling = SchoolInvulling(
         ambitie=ambitie,
@@ -703,24 +961,16 @@ def main():
     # ========================================================================
     # Document Context (RAG of enkel document)
     # ========================================================================
-
-    # Initialiseer rag_context (altijd None tenzij RAG actief is)
     rag_context = None
     rag_active = False
-    rag_available_sources = []  # Bronnen die beschikbaar zijn voor de AI
 
     if RAG_ENABLED:
-        with st.expander("Documentdatabank beheren", expanded=False):
-            render_document_databank()
-
         # RAG toggle en context ophalen
-        rag_active, rag_context, rag_available_sources = render_rag_toggle(selected_id, eis)
+        rag_active, rag_context, _rag_sources = render_rag_toggle(selected_id, eis)
 
         if rag_active and rag_context:
-            # RAG is actief, geen single document nodig
             st.markdown("---")
         else:
-            # Toon single document upload als alternatief
             st.markdown("### Of: enkel document koppelen")
             st.caption("Als alternatief voor de documentdatabank kun je ook een enkel document uploaden.")
     else:
@@ -736,9 +986,7 @@ def main():
             key="document_uploader",
         )
 
-        # Verwerk geüpload document
         if uploaded_file is not None:
-            # Check of dit een nieuw bestand is
             if st.session_state.document_filename != uploaded_file.name:
                 with st.spinner("Document verwerken..."):
                     result = extract_text_from_pdf(
@@ -750,7 +998,6 @@ def main():
                         st.session_state.document_text = result.text
                         st.session_state.document_filename = result.filename
 
-                        # Toon document info
                         status_msg = f"Document geladen: {result.page_count} pagina's, {result.char_count:,} karakters"
                         if result.truncated:
                             status_msg += " (ingekort)"
@@ -760,7 +1007,6 @@ def main():
                         st.session_state.document_text = None
                         st.session_state.document_filename = None
 
-        # Toon huidige document status en verwijder optie
         if st.session_state.document_text:
             col1, col2 = st.columns([3, 1])
             with col1:
@@ -777,7 +1023,7 @@ def main():
     # AI Chat & Suggesties - Floating button approach
     # ========================================================================
 
-    # Floating AI button container (rechtsonder)
+    # Popover CSS (alleen op detail page)
     st.markdown("""
     <style>
         /* Style de popover trigger als floating button */
@@ -804,7 +1050,7 @@ def main():
             margin: 0 !important;
             line-height: 1 !important;
         }
-        /* Popover panel styling - meerdere selectors voor compatibiliteit */
+        /* Popover panel styling */
         div[data-testid="stPopoverBody"] {
             width: 900px !important;
             min-width: 900px !important;
@@ -828,7 +1074,7 @@ def main():
     """, unsafe_allow_html=True)
 
     # Floating AI Chat Button met popover
-    with st.popover("🤖", use_container_width=False):
+    with st.popover("\U0001f916", use_container_width=False):
         if SUGGESTIES_ENABLED:
             chat_tabs = st.tabs(["Chat", "Suggesties"])
 
@@ -858,7 +1104,42 @@ def main():
                 document_filename=st.session_state.document_filename,
                 rag_context=rag_context,
             )
-    # ========================================================================
+
+
+# ============================================================================
+# Main
+# ============================================================================
+
+def main():
+    st.set_page_config(
+        page_title="Kwaliteitszorg AI",
+        page_icon="\U0001f393",
+        layout="wide",
+        initial_sidebar_state="collapsed",
+    )
+
+    inject_css()
+    init_session_state()
+
+    # Check Ollama verbinding bij eerste keer laden
+    if "ollama_checked" not in st.session_state:
+        from config.settings import check_ollama_connection
+        success, message = check_ollama_connection()
+        st.session_state.ollama_checked = True
+        st.session_state.ollama_ok = success
+        st.session_state.ollama_message = message
+
+    if not st.session_state.ollama_ok:
+        st.error(f"**Ollama niet beschikbaar:** {st.session_state.ollama_message}")
+        st.info("Start Ollama en herlaad deze pagina.")
+        st.stop()
+
+    # Routing
+    page = st.session_state.get("current_page", "home")
+    if page == "eis_detail" and st.session_state.get("current_eis"):
+        render_eis_detail_page()
+    else:
+        render_home_page()
 
 
 if __name__ == "__main__":

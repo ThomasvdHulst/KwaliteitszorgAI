@@ -249,6 +249,54 @@ HOE DE PASSAGES TE GEBRUIKEN:
 """
 
 
+def get_standaard_task_instruction(vraag_type: str, has_rag: bool = False) -> str:
+    """
+    Geef taak-specifieke instructie voor standaard-niveau chats.
+
+    Args:
+        vraag_type: Type vraag (feedback/uitleg/algemeen)
+        has_rag: Of er RAG-passages zijn opgehaald
+    """
+
+    if vraag_type == "feedback":
+        instruction = """Beoordeel de invullingen van de school voor deze gehele standaard.
+
+<instructies>
+1. Geef een overkoepelend oordeel over de standaard: Goed / Voldoende / Onvoldoende / Niet te beoordelen
+2. Beoordeel de samenhang: sluiten de invullingen van de verschillende eisen op elkaar aan?
+3. Benoem per eis kort de sterke punten en verbeterpunten
+4. Geef aan welke eisen het meeste aandacht nodig hebben
+5. Sluit af met concrete vervolgstappen voor de hele standaard
+6. Eisen waar de school nog niets heeft ingevuld: benoem dit als belangrijk aandachtspunt
+</instructies>"""
+
+    elif vraag_type == "uitleg":
+        instruction = """Leg deze standaard uit en hoe de eisen met elkaar samenhangen.
+
+Behandel:
+- Wat houdt de standaard als geheel in?
+- Hoe hangen de verschillende eisen samen?
+- Waar moet een school op letten bij het invullen?
+- Gebruik het naslagwerk om concrete voorbeelden te geven"""
+
+    elif vraag_type == "suggestie":
+        instruction = """Geef concrete suggesties om de invullingen voor deze standaard te verbeteren.
+
+Beschrijf per eis:
+- Wat de school kan verbeteren of aanvullen
+- Hoe de invullingen beter op elkaar kunnen aansluiten
+- Gebruik het naslagwerk als basis voor concrete suggesties
+- VERZIN niets dat niet in het naslagwerk of de eisinformatie staat"""
+
+    else:  # algemeen
+        instruction = "Beantwoord de vraag op basis van de standaardinformatie, het naslagwerk en de schoolinvullingen."
+
+    if has_rag:
+        instruction += get_rag_task_addition(vraag_type)
+
+    return instruction
+
+
 def get_task_instruction(vraag_type: str, has_document: bool = False, has_rag: bool = False) -> str:
     """
     Geef taak-specifieke instructie terug.

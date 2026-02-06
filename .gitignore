@@ -64,3 +64,6 @@ htmlcov/
 
 # Voorbeeldbeleid folder (contains PDFs)
 voorbeeldbeleid/
+
+# School-specifieke invullingen
+data/school_invullingen.json

@@ -17,6 +17,7 @@ from .prompts import (
     build_document_context,
     build_rag_context,
     generate_document_salt,
+    get_standaard_task_instruction,
     get_task_instruction,
 )
 
@@ -66,6 +67,7 @@ class DeugdelijkheidseisAssistent:
         self.database_path = database_path or str(settings.DATABASE_PATH)
         self.database = load_database(self.database_path)
         self.chat_history: List[Dict[str, str]] = []
+        self.standaard_chat_history: List[Dict[str, str]] = []
         # Unieke salt per sessie voor document tags (prompt injection preventie)
         self.document_salt = generate_document_salt()
 
@@ -201,6 +203,116 @@ INVULLING VAN DE SCHOOL:
             base_message += f"\n\n---\n{document_context}"
 
         return base_message
+
+    def chat_standaard(
+        self,
+        standaard_naam: str,
+        eisen_met_invullingen: Dict[str, "SchoolInvulling"],
+        vraag: str,
+        vraag_type: str = "algemeen",
+        stream_handler: Optional[Callable[[str], None]] = None,
+        naslagwerk: str = "",
+        standaard_omschrijving: str = "",
+        rag_context: Optional[str] = None,
+    ) -> str:
+        """
+        Voer een chat uit op standaard-niveau (meerdere eisen tegelijk).
+
+        Args:
+            standaard_naam: Naam van de standaard (bijv. "OP4 - Onderwijstijd")
+            eisen_met_invullingen: Dict van eis_id -> SchoolInvulling
+            vraag: De vraag van de gebruiker
+            vraag_type: Type vraag (feedback/uitleg/suggestie/algemeen)
+            stream_handler: Optionele callback voor streaming
+            naslagwerk: Standaard-specifiek naslagwerk (blog, kenniskaart)
+            standaard_omschrijving: Korte omschrijving van de standaard
+            rag_context: Optionele context van RAG-opgehaalde passages
+
+        Returns:
+            Het antwoord van de assistent
+        """
+        system_content = self._build_standaard_system_message(
+            standaard_naam=standaard_naam,
+            eisen_met_invullingen=eisen_met_invullingen,
+            vraag_type=vraag_type,
+            naslagwerk=naslagwerk,
+            standaard_omschrijving=standaard_omschrijving,
+            rag_context=rag_context,
+        )
+
+        messages = [{"role": "system", "content": system_content}]
+        for msg in self.standaard_chat_history:
+            messages.append(msg)
+        messages.append({"role": "user", "content": vraag})
+
+        antwoord = self._generate(messages, stream_handler)
+
+        self.standaard_chat_history.append({"role": "user", "content": vraag})
+        self.standaard_chat_history.append({"role": "assistant", "content": antwoord})
+
+        max_messages = settings.MAX_CONVERSATION_HISTORY * 2
+        if len(self.standaard_chat_history) > max_messages:
+            self.standaard_chat_history = self.standaard_chat_history[-max_messages:]
+
+        return antwoord
+
+    def _build_standaard_system_message(
+        self,
+        standaard_naam: str,
+        eisen_met_invullingen: Dict[str, "SchoolInvulling"],
+        vraag_type: str,
+        naslagwerk: str = "",
+        standaard_omschrijving: str = "",
+        rag_context: Optional[str] = None,
+    ) -> str:
+        """Bouw de system message voor standaard-niveau chat (lean context)."""
+        has_rag = bool(rag_context)
+        task_instruction = get_standaard_task_instruction(vraag_type, has_rag=has_rag)
+
+        # Header
+        parts = [
+            SYSTEM_PROMPT,
+            f"\n\n---\nHUIDIGE TAAK: {task_instruction}\n---",
+            f"\nSTANDAARD: {standaard_naam}",
+        ]
+
+        if standaard_omschrijving:
+            parts.append(f"Omschrijving: {standaard_omschrijving}")
+
+        # Naslagwerk (blog, kenniskaart)
+        if naslagwerk:
+            parts.append(f"\nNASLAGWERK OVER DEZE STANDAARD:\n{naslagwerk}")
+
+        # Eisen met lean context (eisomschrijving + uitleg + invulling)
+        parts.append("\n---\nOVERZICHT EISEN EN INVULLINGEN:")
+
+        for eis_id in sorted(eisen_met_invullingen.keys()):
+            invulling = eisen_met_invullingen[eis_id]
+            try:
+                eis = load_deugdelijkheidseis(self.database, eis_id)
+            except Exception:
+                continue
+
+            parts.append(f"\n=== {eis['id']} - {eis['titel']} ===")
+            parts.append(f"Eisomschrijving:\n{eis['eisomschrijving']}")
+            parts.append(f"\nUitleg:\n{eis['uitleg']}")
+            parts.append(f"\nInvulling van de school:\n{invulling.to_text()}")
+
+        base_message = "\n".join(parts)
+
+        # RAG context
+        if rag_context:
+            rag_formatted = build_rag_context(
+                rag_chunks_text=rag_context,
+                salt=self.document_salt,
+            )
+            base_message += f"\n\n---\n{rag_formatted}"
+
+        return base_message
+
+    def reset_standaard_chat(self):
+        """Reset de standaard chatgeschiedenis."""
+        self.standaard_chat_history = []
 
     def _generate(
         self,

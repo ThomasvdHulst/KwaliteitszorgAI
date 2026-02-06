@@ -84,10 +84,15 @@ def check_ollama_connection() -> tuple[bool, str]:
         settings = get_settings()
 
         # Check of Ollama server bereikbaar is
-        models = ollama.list()
+        response = ollama.list()
 
         # Check of het benodigde model aanwezig is
-        model_names = [m.get("name", m.get("model", "")) for m in models.get("models", [])]
+        # Ondersteun zowel nieuwere (object) als oudere (dict) ollama library versies
+        model_names = []
+        if hasattr(response, 'models'):
+            model_names = [m.model for m in response.models if hasattr(m, 'model')]
+        elif isinstance(response, dict) and 'models' in response:
+            model_names = [m.get("name", m.get("model", "")) for m in response.get("models", [])]
 
         # Ollama kan modelnamen met :latest suffix hebben
         model_base = settings.model_name.split(":")[0]
