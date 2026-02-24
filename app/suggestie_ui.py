@@ -322,7 +322,9 @@ def render_suggesties_tab(
 
     # Genereer knop
     if st.button("Genereer suggesties", type="primary", use_container_width=True):
-        generator = SuggestieGenerator()
+        # Hergebruik bestaande RAG retriever uit session state indien beschikbaar
+        existing_retriever = st.session_state.get("rag_retriever")
+        generator = SuggestieGenerator(retriever=existing_retriever)
 
         spinner_text = "AI analyseert je invulling..."
         if enrich_query:

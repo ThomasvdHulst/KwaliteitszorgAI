@@ -74,3 +74,18 @@ def get_invulling_status(eis_id: str) -> str:
     if eis_id in data["invullingen"]:
         return "opgeslagen"
     return "niet_opgeslagen"
+
+
+def load_school_naam() -> str:
+    """Laad de schoolnaam uit opslag."""
+    data = _load_file()
+    return data.get("school_meta", {}).get("school_naam", "")
+
+
+def save_school_naam(naam: str):
+    """Sla de schoolnaam op."""
+    data = _load_file()
+    if "school_meta" not in data:
+        data["school_meta"] = {}
+    data["school_meta"]["school_naam"] = naam.strip()
+    _save_file(data)

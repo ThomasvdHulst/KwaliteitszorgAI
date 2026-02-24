@@ -41,7 +41,10 @@
       "Bash(git gc:*)",
       "WebFetch(domain:docs.anthropic.com)",
       "WebFetch(domain:github.com)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(./venv/bin/python3:*)",
+      "Bash(pip install:*)",
+      "Bash(venv/bin/python:*)"
     ]
   }
 }

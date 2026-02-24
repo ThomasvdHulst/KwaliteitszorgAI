@@ -63,6 +63,8 @@ try:
         load_invulling,
         save_invulling,
         get_invulling_status,
+        load_school_naam,
+        save_school_naam,
     )
     STORAGE_ENABLED = True
 except ImportError:
@@ -71,10 +73,36 @@ except ImportError:
             load_invulling,
             save_invulling,
             get_invulling_status,
+            load_school_naam,
+            save_school_naam,
         )
         STORAGE_ENABLED = True
     except ImportError:
         STORAGE_ENABLED = False
+# ============================================================================
+
+# ============================================================================
+# Document generation import
+# ============================================================================
+try:
+    from app.document_generator import generate_beleidsstuk, generate_ai_beleidsstuk
+    DOCGEN_ENABLED = True
+except ImportError:
+    try:
+        from document_generator import generate_beleidsstuk, generate_ai_beleidsstuk
+        DOCGEN_ENABLED = True
+    except ImportError:
+        DOCGEN_ENABLED = False
+# ============================================================================
+
+# ============================================================================
+# AI Beleidsstuk generator import
+# ============================================================================
+try:
+    from src.kwaliteitszorg.assistant.beleidsstuk import BeleidsstukGenerator
+    AI_DOCGEN_ENABLED = True
+except ImportError:
+    AI_DOCGEN_ENABLED = False
 # ============================================================================
 
 # Thema kleuren
@@ -236,6 +264,55 @@ def inject_css():
     """, unsafe_allow_html=True)
 
 
+def inject_popover_css():
+    """CSS voor de floating AI chat popover button."""
+    st.markdown("""
+    <style>
+        div[data-testid="stPopover"] > div:first-child > button {
+            position: fixed !important;
+            bottom: 24px !important;
+            right: 24px !important;
+            width: 64px !important;
+            height: 64px !important;
+            border-radius: 50% !important;
+            background: linear-gradient(135deg, #4599D5 0%, #2C81C0 100%) !important;
+            box-shadow: 0 4px 16px rgba(69, 153, 213, 0.4) !important;
+            z-index: 9999 !important;
+            padding: 0 !important;
+            min-height: unset !important;
+            border: none !important;
+        }
+        div[data-testid="stPopover"] > div:first-child > button:hover {
+            transform: scale(1.1) !important;
+            box-shadow: 0 6px 24px rgba(69, 153, 213, 0.5) !important;
+        }
+        div[data-testid="stPopover"] > div:first-child > button p {
+            font-size: 28px !important;
+            margin: 0 !important;
+            line-height: 1 !important;
+        }
+        div[data-testid="stPopoverBody"] {
+            width: 900px !important;
+            min-width: 900px !important;
+            max-width: 900px !important;
+            min-height: 600px !important;
+            max-height: 85vh !important;
+        }
+        div[data-testid="stPopoverBody"] > div {
+            width: 100% !important;
+            min-height: 580px !important;
+        }
+        [data-baseweb="popover"] > div {
+            width: 700px !important;
+            min-width: 700px !important;
+        }
+        [data-baseweb="popover"] [data-testid="stVerticalBlockBorderWrapper"] {
+            width: 100% !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+
 @st.cache_data
 def get_database() -> dict:
     return load_database(str(settings.DATABASE_PATH))
@@ -279,6 +356,11 @@ def init_session_state():
     # RAG state
     if RAG_ENABLED:
         init_rag_state()
+    # Beleidsstuk generatie state
+    if "beleidsstuk_results" not in st.session_state:
+        st.session_state.beleidsstuk_results = {}
+    if "beleidsstuk_docx" not in st.session_state:
+        st.session_state.beleidsstuk_docx = {}
 
 
 def reset_chat():
@@ -685,6 +767,154 @@ def _group_eisen_by_standaard(eisen: dict) -> dict:
     return dict(grouped)
 
 
+def _render_ai_beleidsstuk_section(
+    standaard: str, eis_lijst: list, school_naam: str
+):
+    """Render de twee-staps AI beleidsstuk generatie per standaard."""
+    standaard_key = standaard.replace(" ", "_")
+
+    # Check of er invullingen zijn
+    has_invullingen = False
+    if STORAGE_ENABLED:
+        for eis_id, _eis_data in eis_lijst:
+            inv = load_invulling(eis_id)
+            if inv and any(inv.get(k) for k in ["ambitie", "beoogd_resultaat", "concrete_acties", "wijze_van_meten"]):
+                has_invullingen = True
+                break
+
+    # Check of er al een gecached resultaat is
+    cached_result = st.session_state.beleidsstuk_results.get(standaard_key)
+    cached_docx = st.session_state.beleidsstuk_docx.get(standaard_key)
+
+    if cached_result and cached_docx:
+        # Stap 2: Download + opnieuw genereren
+        col_dl, col_regen = st.columns([2, 1])
+        with col_dl:
+            st.download_button(
+                label="Download beleidsstuk",
+                data=cached_docx,
+                file_name=f"Beleidsstuk {standaard}.docx",
+                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                key=f"download_{standaard_key}",
+                type="primary",
+                use_container_width=True,
+            )
+        with col_regen:
+            if st.button(
+                "Opnieuw genereren",
+                key=f"regen_{standaard_key}",
+                use_container_width=True,
+            ):
+                st.session_state.beleidsstuk_results.pop(standaard_key, None)
+                st.session_state.beleidsstuk_docx.pop(standaard_key, None)
+                st.rerun()
+
+    elif cached_result and not cached_result.success:
+        # Fout bij eerdere poging
+        st.error(f"Fout bij genereren: {cached_result.error}")
+        if st.button(
+            "Opnieuw proberen",
+            key=f"retry_{standaard_key}",
+        ):
+            st.session_state.beleidsstuk_results.pop(standaard_key, None)
+            st.rerun()
+
+    else:
+        # Stap 1: Genereer-knop
+        if st.button(
+            "Beleidsstuk genereren",
+            key=f"generate_{standaard_key}",
+            disabled=not has_invullingen,
+            help="Vul eerst eisen in voordat je een beleidsstuk genereert" if not has_invullingen else None,
+        ):
+            if not has_invullingen:
+                st.warning("Er zijn nog geen invullingen voor deze standaard.")
+            else:
+                _run_beleidsstuk_generation(
+                    standaard, standaard_key, eis_lijst, school_naam
+                )
+
+
+def _run_beleidsstuk_generation(
+    standaard: str, standaard_key: str, eis_lijst: list, school_naam: str
+):
+    """Voer de AI beleidsstuk generatie uit met voortgangsindicator."""
+    # Verzamel invullingen als SchoolInvulling objecten
+    invullingen = {}
+    for eis_id, _eis_data in eis_lijst:
+        if STORAGE_ENABLED:
+            data = load_invulling(eis_id)
+            if data:
+                invullingen[eis_id] = SchoolInvulling(
+                    ambitie=data.get("ambitie", ""),
+                    beoogd_resultaat=data.get("beoogd_resultaat", ""),
+                    concrete_acties=data.get("concrete_acties", ""),
+                    wijze_van_meten=data.get("wijze_van_meten", ""),
+                )
+
+    # Progress UI
+    progress_bar = st.progress(0)
+    status_text = st.empty()
+
+    def progress_callback(current, total, label):
+        if total > 0:
+            progress_bar.progress(current / total)
+        status_text.caption(f"Hoofdstuk {current + 1}/{total}: {label}...")
+
+    # Genereer
+    generator = BeleidsstukGenerator()
+    resultaat = generator.genereer_beleidsstuk(
+        standaard_naam=standaard,
+        eis_lijst=eis_lijst,
+        invullingen=invullingen,
+        progress_callback=progress_callback,
+    )
+
+    # Opruimen progress UI
+    progress_bar.empty()
+    status_text.empty()
+
+    # Sla resultaat op
+    st.session_state.beleidsstuk_results[standaard_key] = resultaat
+
+    if resultaat.success:
+        # Genereer Word document
+        docx_bytes = generate_ai_beleidsstuk(
+            standaard_naam=standaard,
+            school_naam=school_naam,
+            hoofdstukken=resultaat.hoofdstukken,
+        )
+        st.session_state.beleidsstuk_docx[standaard_key] = docx_bytes
+
+    st.rerun()
+
+
+def _render_fallback_download(
+    standaard: str, eis_lijst: list, school_naam: str
+):
+    """Render de directe download-knop (fallback als AI niet beschikbaar is)."""
+    standaard_invullingen = {}
+    if STORAGE_ENABLED:
+        for eis_id, _eis_data in eis_lijst:
+            inv = load_invulling(eis_id)
+            if inv:
+                standaard_invullingen[eis_id] = inv
+
+    docx_bytes = generate_beleidsstuk(
+        standaard_naam=standaard,
+        eis_lijst=eis_lijst,
+        school_naam=school_naam,
+        invullingen=standaard_invullingen,
+    )
+    st.download_button(
+        label="Beleidsstuk downloaden",
+        data=docx_bytes,
+        file_name=f"Beleidsstuk {standaard}.docx",
+        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        key=f"download_{standaard}",
+    )
+
+
 def render_home_page():
     """Render de home-pagina met overzicht van alle eisen."""
     database = get_database()
@@ -702,6 +932,21 @@ def render_home_page():
     </div>
     """, unsafe_allow_html=True)
 
+    # Schoolnaam invoer
+    if STORAGE_ENABLED:
+        if "school_naam" not in st.session_state:
+            st.session_state.school_naam = load_school_naam()
+
+        school_naam_input = st.text_input(
+            "Schoolnaam",
+            value=st.session_state.school_naam,
+            placeholder="Vul hier de naam van jullie school in",
+            key="school_naam_input",
+        )
+        if school_naam_input != st.session_state.school_naam:
+            st.session_state.school_naam = school_naam_input
+            save_school_naam(school_naam_input)
+
     # Documentdatabank in expander
     if RAG_ENABLED:
         with st.expander("Documentdatabank beheren", expanded=False):
@@ -710,8 +955,19 @@ def render_home_page():
     # Eisen per standaard
     grouped = _group_eisen_by_standaard(eisen)
 
+    school_naam = st.session_state.get("school_naam", "") if STORAGE_ENABLED else ""
+
     for standaard, eis_lijst in grouped.items():
         st.markdown(f"### {standaard}")
+
+        # Beleidsstuk generatie sectie
+        if AI_DOCGEN_ENABLED and DOCGEN_ENABLED:
+            _render_ai_beleidsstuk_section(
+                standaard, eis_lijst, school_naam
+            )
+        elif DOCGEN_ENABLED:
+            # Fallback: directe download zonder AI
+            _render_fallback_download(standaard, eis_lijst, school_naam)
 
         # 3 kolommen
         cols = st.columns(3)
@@ -747,52 +1003,7 @@ def render_home_page():
     naslagwerk_db = get_standaard_naslagwerk()
     standaard_options = list(grouped.keys())
 
-    # Popover CSS
-    st.markdown("""
-    <style>
-        div[data-testid="stPopover"] > div:first-child > button {
-            position: fixed !important;
-            bottom: 24px !important;
-            right: 24px !important;
-            width: 64px !important;
-            height: 64px !important;
-            border-radius: 50% !important;
-            background: linear-gradient(135deg, #4599D5 0%, #2C81C0 100%) !important;
-            box-shadow: 0 4px 16px rgba(69, 153, 213, 0.4) !important;
-            z-index: 9999 !important;
-            padding: 0 !important;
-            min-height: unset !important;
-            border: none !important;
-        }
-        div[data-testid="stPopover"] > div:first-child > button:hover {
-            transform: scale(1.1) !important;
-            box-shadow: 0 6px 24px rgba(69, 153, 213, 0.5) !important;
-        }
-        div[data-testid="stPopover"] > div:first-child > button p {
-            font-size: 28px !important;
-            margin: 0 !important;
-            line-height: 1 !important;
-        }
-        div[data-testid="stPopoverBody"] {
-            width: 900px !important;
-            min-width: 900px !important;
-            max-width: 900px !important;
-            min-height: 600px !important;
-            max-height: 85vh !important;
-        }
-        div[data-testid="stPopoverBody"] > div {
-            width: 100% !important;
-            min-height: 580px !important;
-        }
-        [data-baseweb="popover"] > div {
-            width: 700px !important;
-            min-width: 700px !important;
-        }
-        [data-baseweb="popover"] [data-testid="stVerticalBlockBorderWrapper"] {
-            width: 100% !important;
-        }
-    </style>
-    """, unsafe_allow_html=True)
+    inject_popover_css()
 
     with st.popover("\U0001f916", use_container_width=False):
         st.markdown("### Standaard AI Assistent")
@@ -1023,55 +1234,7 @@ def render_eis_detail_page():
     # AI Chat & Suggesties - Floating button approach
     # ========================================================================
 
-    # Popover CSS (alleen op detail page)
-    st.markdown("""
-    <style>
-        /* Style de popover trigger als floating button */
-        div[data-testid="stPopover"] > div:first-child > button {
-            position: fixed !important;
-            bottom: 24px !important;
-            right: 24px !important;
-            width: 64px !important;
-            height: 64px !important;
-            border-radius: 50% !important;
-            background: linear-gradient(135deg, #4599D5 0%, #2C81C0 100%) !important;
-            box-shadow: 0 4px 16px rgba(69, 153, 213, 0.4) !important;
-            z-index: 9999 !important;
-            padding: 0 !important;
-            min-height: unset !important;
-            border: none !important;
-        }
-        div[data-testid="stPopover"] > div:first-child > button:hover {
-            transform: scale(1.1) !important;
-            box-shadow: 0 6px 24px rgba(69, 153, 213, 0.5) !important;
-        }
-        div[data-testid="stPopover"] > div:first-child > button p {
-            font-size: 28px !important;
-            margin: 0 !important;
-            line-height: 1 !important;
-        }
-        /* Popover panel styling */
-        div[data-testid="stPopoverBody"] {
-            width: 900px !important;
-            min-width: 900px !important;
-            max-width: 900px !important;
-            min-height: 600px !important;
-            max-height: 85vh !important;
-        }
-        div[data-testid="stPopoverBody"] > div {
-            width: 100% !important;
-            min-height: 580px !important;
-        }
-        /* Fallback selectors */
-        [data-baseweb="popover"] > div {
-            width: 700px !important;
-            min-width: 700px !important;
-        }
-        [data-baseweb="popover"] [data-testid="stVerticalBlockBorderWrapper"] {
-            width: 100% !important;
-        }
-    </style>
-    """, unsafe_allow_html=True)
+    inject_popover_css()
 
     # Floating AI Chat Button met popover
     with st.popover("\U0001f916", use_container_width=False):

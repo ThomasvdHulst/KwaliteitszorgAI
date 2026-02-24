@@ -139,20 +139,25 @@ def extract_text_from_pdf(
 
         doc.close()
 
-        # Combineer en clean tekst
-        full_text = "\n".join(text_parts)
-        cleaned_text = _clean_extracted_text(full_text)
+        # Clean elke pagina apart en bereken nauwkeurige page boundaries
+        # Dit is nauwkeuriger dan een globale ratio, omdat cleaning
+        # verschillende hoeveelheden tekst verwijdert per pagina.
+        cleaned_parts = []
+        adjusted_boundaries = []
+        cleaned_offset = 0
 
-        # Herbereken page boundaries na cleaning (tekst kan korter worden)
-        # We gebruiken een simpele mapping: de ratio van cleaning
-        if len(full_text) > 0:
-            ratio = len(cleaned_text) / len(full_text)
-            adjusted_boundaries = [
-                (pg, int(start * ratio), int(end * ratio))
-                for pg, start, end in page_boundaries
-            ]
-        else:
-            adjusted_boundaries = page_boundaries
+        for i, raw_page_text in enumerate(text_parts):
+            cleaned_page = _clean_extracted_text(raw_page_text)
+            page_num = page_boundaries[i][0] if i < len(page_boundaries) else i + 1
+
+            if cleaned_page:
+                adjusted_boundaries.append(
+                    (page_num, cleaned_offset, cleaned_offset + len(cleaned_page))
+                )
+                cleaned_parts.append(cleaned_page)
+                cleaned_offset += len(cleaned_page) + 1  # +1 voor de "\n" joiner
+
+        cleaned_text = "\n".join(cleaned_parts)
 
         logger.info(
             "PDF verwerkt: %s (%d/%d pagina's, %d karakters%s)",

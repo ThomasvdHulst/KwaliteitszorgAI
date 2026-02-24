@@ -106,8 +106,12 @@ class DeugdelijkheidseisAssistent:
             Het antwoord van de assistent
         """
         # Bouw de system prompt met alle context
+        # Bij het eerste bericht sturen we volledige context (incl. voorbeelden/tips).
+        # Bij vervolgberichten laten we deze weg om context window te besparen.
+        is_first_message = len(self.chat_history) == 0
         system_content = self._build_system_message(
-            eis_id, school_invulling, vraag_type, document_text, document_filename, rag_context
+            eis_id, school_invulling, vraag_type, document_text, document_filename,
+            rag_context, include_voorbeelden=is_first_message,
         )
 
         # Bouw de messages array
@@ -142,8 +146,17 @@ class DeugdelijkheidseisAssistent:
         document_text: Optional[str] = None,
         document_filename: Optional[str] = None,
         rag_context: Optional[str] = None,
+        include_voorbeelden: bool = True,
     ) -> str:
-        """Bouw de system message met alle context."""
+        """
+        Bouw de system message met alle context.
+
+        Args:
+            include_voorbeelden: Bij True worden tips en voorbeelden meegestuurd.
+                Bij False (vervolgberichten) worden deze weggelaten om context
+                window te besparen. De AI heeft ze al gezien in het eerste bericht
+                en de chat history bevat het eerdere antwoord.
+        """
         eis = load_deugdelijkheidseis(self.database, eis_id)
 
         # Bepaal welke context beschikbaar is
@@ -173,13 +186,18 @@ Uitleg:
 {eis['uitleg']}
 
 Focuspunten:
-{eis['focuspunten']}
+{eis['focuspunten']}"""
+
+        if include_voorbeelden:
+            base_message += f"""
 
 Tips:
 {eis['tips']}
 
 Voorbeelden:
-{eis['voorbeelden']}
+{eis['voorbeelden']}"""
+
+        base_message += f"""
 
 ---
 
@@ -283,7 +301,7 @@ INVULLING VAN DE SCHOOL:
         if naslagwerk:
             parts.append(f"\nNASLAGWERK OVER DEZE STANDAARD:\n{naslagwerk}")
 
-        # Eisen met lean context (eisomschrijving + uitleg + invulling)
+        # Eisen met lean context (eisomschrijving + uitleg + focuspunten + invulling)
         parts.append("\n---\nOVERZICHT EISEN EN INVULLINGEN:")
 
         for eis_id in sorted(eisen_met_invullingen.keys()):
@@ -296,6 +314,7 @@ INVULLING VAN DE SCHOOL:
             parts.append(f"\n=== {eis['id']} - {eis['titel']} ===")
             parts.append(f"Eisomschrijving:\n{eis['eisomschrijving']}")
             parts.append(f"\nUitleg:\n{eis['uitleg']}")
+            parts.append(f"\nFocuspunten:\n{eis['focuspunten']}")
             parts.append(f"\nInvulling van de school:\n{invulling.to_text()}")
 
         base_message = "\n".join(parts)

@@ -486,7 +486,7 @@ class DocumentChunker:
                 if char_start == -1:
                     char_start = char_position
                 char_end = char_start + len(clean_text)
-                char_position = char_start + 100
+                char_position = char_end
             except Exception:
                 char_start = char_position
                 char_end = char_start + len(text)
