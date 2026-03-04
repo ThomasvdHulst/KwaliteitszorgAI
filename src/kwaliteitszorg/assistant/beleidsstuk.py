@@ -214,7 +214,8 @@ class BeleidsstukGenerator:
         )
 
         user_message = self._build_user_message(
-            chapter_type, label, standaard_naam, eis_inputs
+            chapter_type, label, standaard_naam, eis_inputs,
+            eis_lijst=eis_lijst,
         )
 
         # Genereer
@@ -280,10 +281,12 @@ class BeleidsstukGenerator:
         label: str,
         standaard_naam: str,
         eis_inputs: List[tuple],
+        eis_lijst: list = None,
     ) -> str:
         """Bouw het user message met school inputs per eis."""
         parts = [
-            f'Schrijf het hoofdstuk "{label}" voor het beleidsstuk "{standaard_naam}".',
+            f'Herformuleer de schoolinvullingen hieronder tot beleidstekst '
+            f'voor het hoofdstuk "{label}".',
             "",
         ]
 
@@ -292,10 +295,7 @@ class BeleidsstukGenerator:
                 "Hieronder staan de eisomschrijvingen en uitleg per eis:"
             )
         else:
-            pdca_label = label.lower()
-            parts.append(
-                f"Hieronder staat de {pdca_label} die de school heeft ingevuld per eis:"
-            )
+            parts.append("SCHOOLINVULLINGEN:")
 
         parts.append("")
 
@@ -304,7 +304,15 @@ class BeleidsstukGenerator:
             parts.append(tekst)
             parts.append("")
 
-        parts.append("Combineer deze tot een samenhangend verhaal.")
+        if chapter_type == "wettelijk_kader":
+            parts.append(
+                "Vat de wettelijke kaders samen tot een samenhangend geheel."
+            )
+        else:
+            parts.append(
+                "Herformuleer bovenstaande teksten tot één samenhangend geheel. "
+                "Voeg GEEN nieuwe inhoud, doelen, acties of details toe."
+            )
 
         return "\n".join(parts)
 
@@ -330,7 +338,7 @@ class BeleidsstukGenerator:
         ]
 
         options = {
-            "temperature": 0.4,
+            "temperature": 0.2,
             "num_predict": 2000,
             "num_ctx": 32768,
         }

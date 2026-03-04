@@ -275,6 +275,19 @@ def _add_table_of_contents(doc: Document, hoofdstukken: list):
     doc.add_page_break()
 
 
+def _strip_duplicate_heading(content: str, label: str) -> str:
+    """Strip de hoofdstuktitel als die door de AI als eerste regel is herhaald."""
+    lines = content.split("\n")
+    if not lines:
+        return content
+    first = lines[0].strip()
+    # Check diverse vormen: "Ambitie", "## Ambitie", "**Ambitie**", "# Ambitie"
+    cleaned = first.lstrip("#").strip().strip("*").strip()
+    if cleaned.lower() == label.lower():
+        return "\n".join(lines[1:]).lstrip("\n")
+    return content
+
+
 def _add_ai_chapter(doc: Document, nummer: int, hoofdstuk):
     """Voeg een AI-gegenereerd hoofdstuk toe."""
     # Heading
@@ -283,6 +296,9 @@ def _add_ai_chapter(doc: Document, nummer: int, hoofdstuk):
         run.font.color.rgb = DONKER
 
     content = hoofdstuk.content
+
+    # Strip duplicate heading als de AI de hoofdstuktitel herhaalt
+    content = _strip_duplicate_heading(content, hoofdstuk.label)
 
     # Placeholder tekst
     if hoofdstuk.skipped or not content or content == "[Nog niet ingevuld door de school]":
@@ -327,8 +343,18 @@ def _add_ai_content(doc: Document, content: str):
             flush_paragraph()
             continue
 
+        # Markdown headings (## of ###) -> sub-heading
+        if stripped.startswith("## ") or stripped.startswith("### "):
+            flush_paragraph()
+            heading_text = stripped.lstrip("#").strip()
+            p = doc.add_paragraph()
+            run = p.add_run(heading_text)
+            run.font.bold = True
+            run.font.size = Pt(11)
+            run.font.color.rgb = BLAUW
+
         # Bullet point
-        if stripped.startswith("- ") or stripped.startswith("* "):
+        elif stripped.startswith("- ") or stripped.startswith("* "):
             flush_paragraph()
             bullet_text = stripped[2:]
             _add_bullet_paragraph(doc, bullet_text)
